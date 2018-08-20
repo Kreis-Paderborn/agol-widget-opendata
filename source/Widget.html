@@ -1,0 +1,43 @@
+<div>
+    <!-- <div>This is CustomWidget AT!</div> -->
+	<!-- <div>This is configurable.[${config.configText}]</div> -->
+	<!-- <div data-dojo-attach-point="mapIdNode"></div> -->
+	<br>
+	<form action="https://fme.gkdpb.de/fmedatadownload/KPB_OpenData/NAS_Abgabe.fmw" id="openData" target="_blank">
+
+	<br>
+     <label>Format: 
+	 <!--select name="format" size="1"> 
+	 <option>NAS</option> 
+	 <option>SHAPE</option>
+	 <option>DXF</option> 
+	 </select-->
+	 </label>
+ <br>
+ <label>E-Mail
+    <input type="text" name="opt_requesteremail" id="opt_requesteremail" value="TrantowA@Kreis-Paderborn.de" maxlength="70" />
+	</label>  
+	<br>
+	
+	<input type="text" name="Auftragsnummer" id="AuftragsnummerParam" value="23800" maxlength="70" />
+	</label>  
+	<br>
+	
+	<input type="hidden" id="token" name="token" value="ea7b230dd5b0012c737ee91c78c3c47ce2736ec0" />
+	
+	<input type="hidden" id="opt_servicemode" name="opt_servicemode" value="async" />
+	
+	<input type="hidden" id="Mode" name="Mode" value="server" />
+	
+	<input type="button" class="map-id" value="Zeichne Bereich" name="activate">
+
+	<input type="hidden" id="opt_showresult" name="opt_showresult" value="true" />	
+		
+    <input type="hidden" id="paramRequestPolygon" name="paramRequestPolygon"  />
+    
+	
+    <br>
+
+    <button type="submit" id="submitButton" disabled="disabled">Anfrage absenden</button>
+</form>
+</div>
