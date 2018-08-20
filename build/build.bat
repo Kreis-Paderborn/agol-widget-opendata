@@ -1,0 +1,9 @@
+REM Define general settings
+SET BASE_DIR=%~dp0..
+CALL %BASE_DIR%\config\environment.bat
+
+SET APP_TARGET_DIR=%APPLICATION_WIDGET_FOLDER%%WIDGET_NAME%
+SET BUILDER_TARGET_DIR=%BUILDER_WIDGET_FOLDER%%WIDGET_NAME%
+mkdir "%BUILDER_TARGET_DIR%"
+xcopy "..\source" "%APP_TARGET_DIR%" /Y /s
+xcopy "..\source" "%BUILDER_TARGET_DIR%" /Y /s

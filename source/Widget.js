@@ -115,11 +115,11 @@ define([
 
       onOpen: function(){
         	
-			window.document.getElementById("xmax").value = this.map.extent.xmax;
-			window.document.getElementById("ymax").value = this.map.extent.ymax;
-			window.document.getElementById("xmin").value = this.map.extent.xmin;
-			window.document.getElementById("ymin").value = this.map.extent.ymin;
-			window.document.getElementById("wkid").value = this.map.spatialReference.wkid;
+			// window.document.getElementById("xmax").value = this.map.extent.xmax;
+			// window.document.getElementById("ymax").value = this.map.extent.ymax;
+			// window.document.getElementById("xmin").value = this.map.extent.xmin;
+			// window.document.getElementById("ymin").value = this.map.extent.ymin;
+			// window.document.getElementById("wkid").value = this.map.spatialReference.wkid;
 		
       },
 
