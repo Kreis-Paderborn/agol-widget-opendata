@@ -1,9 +1,8 @@
 <div>
     <!-- <div>This is CustomWidget AT!</div> -->
-	<!-- <div>This is configurable.[${config.configText}]</div> -->
 	<!-- <div data-dojo-attach-point="mapIdNode"></div> -->
 	<br>
-	<form action="https://fme.gkdpb.de/fmedatadownload/KPB_OpenData/NAS_Abgabe.fmw" id="openData" target="_blank">
+	<form action="${config.environment.fmeServerBaseUrl}fmedatadownload/KPB_OpenData/NAS_Abgabe.fmw" id="openDataForm" target="_blank">
 
 	<br>
      <label>Format: 
@@ -14,7 +13,7 @@
 	 </select-->
 	 </label>
  <br>
- <label>E-Mail
+ <label class="jimu-main-font">E-Mail
     <input type="text" name="opt_requesteremail" id="opt_requesteremail" value="TrantowA@Kreis-Paderborn.de" maxlength="70" />
 	</label>  
 	<br>
@@ -25,7 +24,7 @@
 	
 	
 
-	<input type="hidden" id="token" name="token" value="ea7b230dd5b0012c737ee91c78c3c47ce2736ec0" />
+	<input type="hidden" id="token" name="token" value="${config.environment.fmeServerToken}" />
 	
 	<input type="hidden" id="opt_servicemode" name="opt_servicemode" value="async" />
 	
@@ -35,12 +34,55 @@
 
 	<input type="hidden" id="opt_showresult" name="opt_showresult" value="true" />	
 		
-    <input type="hidden" id="paramRequestPolygon" name="paramRequestPolygon"  />
+	<input type="hidden" id="paramRequestPolygon" name="paramRequestPolygon"  />
+	
+	<!-- div class="jimu-btn last-btn" >Clear</div> -->
+
+		<table cellspacing="5" style="width:100%;">
+			<tbody><!--tr data-dojo-attach-point="titleTr">
+				<td style="width:65px;">
+					Normal:
+				</td>
+				<td>
+					<div class="dijit dijitReset dijitInline dijitLeft dijitTextBox dijitValidationTextBox" id="widget_dijit_form_ValidationTextBox_0" role="presentation" widgetid="dijit_form_ValidationTextBox_0" style="width: 100%;"><div class="dijitReset dijitValidationContainer"><input class="dijitReset dijitInputField dijitValidationIcon dijitValidationInner" value="Χ " type="text" tabindex="-1" readonly="readonly" role="presentation"></div><div class="dijitReset dijitInputField dijitInputContainer"><input class="dijitReset dijitInputInner" data-dojo-attach-point="textbox,focusNode" autocomplete="off" name="title" type="text" tabindex="0" id="dijit_form_ValidationTextBox_0" aria-required="true" value="" aria-invalid="false"></div></div>
+				</td>
+			</tr>
+			<tr data-dojo-attach-point="titleTr">
+				<td style="width:65px;">
+					Hover:
+				</td>
+				<td>
+					<div class="dijit dijitReset dijitInline dijitLeft dijitTextBox dijitValidationTextBox dijitTextBoxHover dijitValidationTextBoxHover dijitHover" id="widget_dijit_form_ValidationTextBox_0" role="presentation" widgetid="dijit_form_ValidationTextBox_0" style="width: 100%;"><div class="dijitReset dijitValidationContainer"><input class="dijitReset dijitInputField dijitValidationIcon dijitValidationInner" value="Χ " type="text" tabindex="-1" readonly="readonly" role="presentation"></div><div class="dijitReset dijitInputField dijitInputContainer"><input class="dijitReset dijitInputInner" data-dojo-attach-point="textbox,focusNode" autocomplete="off" name="title" type="text" tabindex="0" id="dijit_form_ValidationTextBox_0" aria-required="true" value="" aria-invalid="false"></div></div>
+				</td>
+			</tr>
+			<tr data-dojo-attach-point="titleTr">
+				<td style="width:65px;">
+					Focused:
+				</td>
+				<td>
+					<div class="dijit dijitReset dijitInline dijitLeft dijitTextBox dijitValidationTextBox dijitTextBoxHover dijitValidationTextBoxHover dijitHover dijitTextBoxHoverFocused dijitValidationTextBoxHoverFocused dijitHoverFocused dijitTextBoxFocused dijitValidationTextBoxFocused dijitFocused" id="widget_dijit_form_ValidationTextBox_0" role="presentation" widgetid="dijit_form_ValidationTextBox_0" style="width: 100%;"><div class="dijitReset dijitValidationContainer"><input class="dijitReset dijitInputField dijitValidationIcon dijitValidationInner" value="Χ " type="text" tabindex="-1" readonly="readonly" role="presentation"></div><div class="dijitReset dijitInputField dijitInputContainer"><input class="dijitReset dijitInputInner" data-dojo-attach-point="textbox,focusNode" autocomplete="off" name="title" type="text" tabindex="0" id="dijit_form_ValidationTextBox_0" aria-required="true" value="" aria-invalid="false"></div></div>
+				</td>
+			</tr>-->
+			<tr data-dojo-attach-point="titleTr">
+				<td style="width:65px;">
+					Ergebnis:
+				</td>
+				<td>
+					<textarea id="dijitTextarea"></textarea>
+				</td>
+			</tr>
+		
+		</tbody></table>
+		
+		<button id="dijitButtonSubmit"></button>
+
+	<!--div class="jimu-btn jimu-state-disabled">Redo</div>
+
+	<button class="jimu-btn jimu-float-trailing jimu-state-active" tabindex="0" title="Anfrage absenden2" type="submit" id="submitButton2" >Anfrage absenden2</button>
     
-	<button class="jimu-btn jimu-float-trailing enable-btn" tabindex="0" title="Anfrage absenden" style="background-color: rgb(81, 141, 202); color: rgb(255, 255, 255); opacity: 1;" type="submit" id="submitButton" disabled="disabled">Anfrage absenden</button>
+	<button class="jimu-btn jimu-float-trailing enable-btn" tabindex="0" title="Anfrage absenden" style="background-color: rgb(81, 141, 202); color: rgb(255, 255, 255); opacity: 1;" type="submit" id="submitButton" disabled="disabled">Anfrage absenden</button -->
 
 	<br>
-
-    <!--button type="submit" id="submitButton" disabled="disabled">Anfrage absenden</button -->
 </form>
+
 </div>
