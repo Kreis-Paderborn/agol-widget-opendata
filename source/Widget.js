@@ -7,7 +7,7 @@ define([
 	'esri/symbols/SimpleFillSymbol',
 	'esri/graphic',
 	'esri/request',
-	'dijit/form/SimpleTextarea',
+	'dijit/form/Textarea',
 	'dijit/form/Button',
 	'dojo/domReady!',
 	'dijit/registry',
@@ -21,7 +21,7 @@ define([
 		SimpleFillSymbol,
 		Graphic,
 		esriRequest,
-		dijitSimpleTextarea,
+		dijitTextarea,
 		dijitButton,
 		dijitReady,
 		dijitRegistry,
@@ -34,15 +34,19 @@ define([
 			baseClass: 'jimu-widget-widget-at',
 
 			fillSymbol: new SimpleFillSymbol("solid", new SimpleLineSymbol("solid", new Color([232, 104, 80]), 2), new Color([232, 104, 80, 0.25])),
+			
+			textAreaDefaultText: "?? - Gültiges Anfragepolygon    ?? - Maximale Größe eingehalten ?? - Anfrage innerhalb KPB",
 
 			draw: undefined,
 
 			startup: function () {
 				this.inherited(arguments);
 
-				var textarea = new dijitSimpleTextarea({
+				var textarea = new dijitTextarea({
 					rows: 6,
 					cols: 32,
+					style: "width:auto;",
+					wrap: "hard",
 					onFocus: function () { console.log("textarea focus handler"); },
 					onBlur: function () { console.log("textarea blur handler"); },
 					selectOnClick: true,
@@ -73,23 +77,36 @@ define([
 					if (this.name === "activate") {
 						me.startDrawing();
 						//alert(this.name);
-						this.name = "deactivate"
+						this.name = "deactivate";
+						this.value = "Bereich zeichnen läuft...";
 					} else {
 						me.stopDrawing();
 						// alert(this.name);
-						this.name = "activate"
+						this.name = "activate";
+						this.value = "Bereich zeichnen starten";
 					}
 				});
 
 			},
 
 			stopDrawing: function () {
+				var drawButton = window.document.getElementById("drawButton");
+				drawButton.name = "activate";
+				drawButton.value = "Bereich zeichnen starten";
+
 				this.map.enableMapNavigation();
 				this.draw.deactivate();
 			},
 
 
 			startDrawing: function () {
+				var drawButton = window.document.getElementById("drawButton");
+				drawButton.name = "deactivate";
+				drawButton.value = "Bereich zeichnen läuft...";
+
+				var textarea = window.document.getElementById("dijitTextarea");
+				textarea.value = this.textAreaDefaultText;
+
 				this.map.disableMapNavigation();
 				this.map.graphics.clear();
 				this.draw.activate('polygon');
@@ -131,9 +148,43 @@ define([
 
 				request.then(
 					function (response) {
-						alert("Liegt vollständig in Kreisgrenze: " + response.data.requestPolygonInsideKPB + "Fläche ungültig: " + response.data.requestPolygonInvalid + "zu groß?: " + response.data.requestPolygonToLarge);
-						window.document.getElementById("dijitTextarea").value = "Liegt vollständig in Kreisgrenze: " + response.data.requestPolygonInsideKPB;
-						dijitRegistry.byId("dijitButtonSubmit").set('disabled', false);
+						var textarea = window.document.getElementById("dijitTextarea");
+						var submit = true;
+						//alert("Liegt vollständig in Kreisgrenze: " + response[0].requestPolygonInsideKPB + "Fläche ungültig: " + response[0].requestPolygonInvalid + "zu groß?: " + response[0].requestPolygonToLarge);
+
+
+						
+						if (response[0].requestPolygonInvalid == 1) {
+							textarea.value = "!! - Gültiges Anfragepolygon    ";	
+							submit = false;
+						} else if (response[0].requestPolygonInvalid == 0) {
+							textarea.value = "ok - Gültiges Anfragepolygon    "	
+						} else {
+							textarea.value = "?? - Gültiges Anfragepolygon    ";
+							submit = false;
+						}
+
+						if (response[0].requestPolygonToLarge == 1) {
+							textarea.value += "!! - Maximale Größe eingehalten ";	
+							submit = false;
+						} else if (response[0].requestPolygonToLarge == 0) {
+							textarea.value += "ok - Maximale Größe eingehalten "	
+						} else {
+							textarea.value += "?? - Maximale Größe eingehalten ";
+							submit = false;
+						}
+
+						if (response[0].requestPolygonOutsideKPB == 1) {
+							textarea.value += "!! - Anfrage innerhalb KPB";	
+							submit = false;
+						} else if (response[0].requestPolygonOutsideKPB == 0) {
+							textarea.value += "ok - Anfrage innerhalb KPB"	
+						} else {
+							textarea.value += "?? - Anfrage innerhalb KPB";
+							submit = false;
+						}
+						
+						dijitRegistry.byId("dijitButtonSubmit").set('disabled', !submit);
 					},
 					function (error) {
 						alert("Error: " + error.message);

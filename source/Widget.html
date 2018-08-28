@@ -30,7 +30,7 @@
 	
 	<input type="hidden" id="Mode" name="Mode" value="server" />
 	
-	<input type="button" class="map-id" value="Zeichne Bereich" name="activate">
+	<input type="button" id="drawButton" class="map-id" value="Bereich zeichnen starten" name="activate">
 
 	<input type="hidden" id="opt_showresult" name="opt_showresult" value="true" />	
 		
@@ -68,7 +68,7 @@
 					Ergebnis:
 				</td>
 				<td>
-					<textarea id="dijitTextarea"></textarea>
+					<textarea  style="height:100px;" id="dijitTextarea">?? - Gültiges Anfragepolygon    ?? - Maximale Größe eingehalten ?? - Anfrage innerhalb KPB</textarea>
 				</td>
 			</tr>
 		
