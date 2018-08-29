@@ -1,1 +1,7 @@
+# my own
 config/environment_custom.bat
+
+# Logs
+logs
+*.log
+npm-debug.log*
