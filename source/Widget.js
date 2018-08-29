@@ -8,6 +8,7 @@ define([
 	'esri/graphic',
 	'esri/request',
 	'dijit/form/Textarea',
+	'dijit/form/ValidationTextBox',
 	'dijit/form/Button',
 	'dojo/domReady!',
 	'dijit/registry',
@@ -22,6 +23,7 @@ define([
 		Graphic,
 		esriRequest,
 		dijitTextarea,
+		dijitValidationTextBox,
 		dijitButton,
 		dijitReady,
 		dijitRegistry,
@@ -37,6 +39,8 @@ define([
 			
 			textAreaDefaultText: "?? - Gültiges Anfragepolygon    ?? - Maximale Größe eingehalten ?? - Anfrage innerhalb KPB",
 
+			textAreaLoadingText: "%% - Gültiges Anfragepolygon    %% - Maximale Größe eingehalten %% - Anfrage innerhalb KPB",
+
 			draw: undefined,
 
 			startup: function () {
@@ -49,13 +53,24 @@ define([
 					wrap: "hard",
 					onFocus: function () { console.log("textarea focus handler"); },
 					onBlur: function () { console.log("textarea blur handler"); },
-					selectOnClick: true,
-					value: ""
+					selectOnClick: true
 				}, "dijitTextarea");
 				textarea.startup();
 
+				var emailTextbox = new dijitValidationTextBox({
+					style: "width:248px;",
+					required: true,
+					promptMessage: "Bitte eMail eingeben.",
+					missingMessage: "Es muss eine eMail angegeben werden.",
+					invalidMessage: "Der eingegeben Wert ist keine gültige eMail-Adresse", 
+					regExp:	"\\w+([\\.-]?\\w+)*@\\w+([\\.-]?\\w+)*(\\.\\w{2,3})+",
+					value: "TrantowA@Kreis-Paderborn.de",
+					name: "opt_requesteremail"
+				}, "opt_requesteremail");
+				emailTextbox.startup();
+
 				var button = new dijitButton({
-					label: "Absenden!!!",
+					label: "Anfrage absenden",
 					//baseClass:"jimu-btn",
 					disabled: true,
 					onClick: function () { 
@@ -78,12 +93,12 @@ define([
 						me.startDrawing();
 						//alert(this.name);
 						this.name = "deactivate";
-						this.value = "Bereich zeichnen läuft...";
+						this.value = "'Bereich zeichnen' läuft...";
 					} else {
 						me.stopDrawing();
 						// alert(this.name);
 						this.name = "activate";
-						this.value = "Bereich zeichnen starten";
+						this.value = "'Bereich zeichnen' starten";
 					}
 				});
 
@@ -92,7 +107,7 @@ define([
 			stopDrawing: function () {
 				var drawButton = window.document.getElementById("drawButton");
 				drawButton.name = "activate";
-				drawButton.value = "Bereich zeichnen starten";
+				drawButton.value = "'Bereich zeichnen' starten";
 
 				this.map.enableMapNavigation();
 				this.draw.deactivate();
@@ -102,7 +117,7 @@ define([
 			startDrawing: function () {
 				var drawButton = window.document.getElementById("drawButton");
 				drawButton.name = "deactivate";
-				drawButton.value = "Bereich zeichnen läuft...";
+				drawButton.value = "'Bereich zeichnen' läuft...";
 
 				var textarea = window.document.getElementById("dijitTextarea");
 				textarea.value = this.textAreaDefaultText;
@@ -116,6 +131,9 @@ define([
 
 				// FIXME: Also set name of draw-button to "deactivate" 
 				this.stopDrawing();
+
+				var textarea = window.document.getElementById("dijitTextarea");
+				textarea.value = this.textAreaLoadingText;
 
 
 
