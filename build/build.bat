@@ -11,6 +11,11 @@ mkdir "%BUILDER_TARGET_DIR%"
 xcopy "..\source" "%APP_TARGET_DIR%" /Y /s
 xcopy "..\source" "%BUILDER_TARGET_DIR%" /Y /s
 
+REM Replace placeholders in copied proxyconfig
+SET PROXY_CONFIG_TARGET_FILE=%APP_TARGET_DIR%\esriProxy\proxy.config
+call replace.bat "%PROXY_CONFIG_TARGET_FILE%" ${PRODUCTION_SERVER_URL} %PRODUCTION_SERVER_URL%
+call replace.bat "%PROXY_CONFIG_TARGET_FILE%" ${FME_SERVER_BASE_URL} %FME_SERVER_BASE_URL%
+
 rem copy config
 SET CONFIG_TARGET_FILE=%APPLICATION_FOLDER%configs\%WIDGET_NAME%\config_%WIDGET_ID%.json
 REM ensure the file exists, because xcopy should not promt for creating the file
