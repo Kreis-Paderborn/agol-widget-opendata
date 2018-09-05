@@ -39,18 +39,23 @@ define([
             fmeServerToken: null,
             draw: null,
             wktPolygon: null,
+            makeSmallCallback: null,
+            makeTallCallback: null,
+
 
 
             textAreaDefaultText: "?? - Gültiges Anfragepolygon    ?? - Maximale Größe eingehalten ?? - Anfrage innerhalb KPB",
 
             textAreaLoadingText: "%% - Gültiges Anfragepolygon    %% - Maximale Größe eingehalten %% - Anfrage innerhalb KPB",
 
-
             constructor: function (map, options) {
 
                 this.map = map;
                 this.fmeServerBaseUrl = options.fmeServerBaseUrl;
                 this.fmeServerToken = options.fmeServerToken;
+                this.makeSmallCallback = options.makeSmallCallback;
+                this.makeTallCallback = options.makeTallCallback;
+
 
 
                 // specify class defaults
@@ -67,8 +72,14 @@ define([
                     cols: 32,
                     style: "width:auto;",
                     wrap: "hard",
-                    onFocus: function () { console.log("textarea focus handler"); },
-                    onBlur: function () { console.log("textarea blur handler"); },
+                    onFocus: function () {
+                        console.log("textarea focus handler");
+
+                        this.makeSmallCallback();
+                    },
+                    onBlur: function () { 
+                        this.makeTallCallback();
+                     },
                     selectOnClick: true
                 }, "dijitTextarea");
                 textarea.startup();
@@ -131,10 +142,10 @@ define([
                 // addGraphic is called by an external function, esriRequest
                 // hitch() is used to provide the proper context so that addGraphic
                 // will have access to the instance of this class
-                //this.addGraphic = lang.hitch(this, this.addGraphic);
+                this.addGraphic = lang.hitch(this, this.addGraphic);
 
                 // if we do not bind this to "addGraphic" it will not run in scope of "this"
-                this.addGraphic = this.addGraphic.bind(this)
+                //this.addGraphic = this.addGraphic.bind(this)
                 this.draw.on("draw-complete", this.addGraphic);
 
 
@@ -161,6 +172,8 @@ define([
                 drawButton.name = "activate";
                 drawButton.value = "'Bereich zeichnen' starten";
 
+                this.makeTallCallback();
+
                 this.map.enableMapNavigation();
                 this.draw.deactivate();
             },
@@ -170,6 +183,9 @@ define([
                 var drawButton = window.document.getElementById("drawButton");
                 drawButton.name = "deactivate";
                 drawButton.value = "'Bereich zeichnen' läuft...";
+
+                this.makeSmallCallback();
+
 
                 var textarea = window.document.getElementById("dijitTextarea");
                 textarea.value = this.textAreaDefaultText;

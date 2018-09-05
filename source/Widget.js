@@ -1,12 +1,16 @@
 define([
 	'dojo/_base/declare',
+	"dojo/_base/lang",
 	'jimu/BaseWidget',
-	'jimu/WidgetManager',
+	'jimu/PanelManager',
+	'dojo/window',
 	'classes/OpenDataForm'],
 	function (
 		declare,
+		lang,
 		BaseWidget,
-		WidgetManager,
+		PanelManager,
+		dojoWindow,
 		OpenDataForm) {
 
 		//To create a widget, you need to derive from BaseWidget.
@@ -18,24 +22,34 @@ define([
 			startup: function () {
 				this.inherited(arguments);
 
+				this.makeSmall = lang.hitch(this, this.makeSmall);
+				this.makeTall = lang.hitch(this, this.makeTall);
+
+
 				var form = new OpenDataForm(this.map, {
 					fmeServerBaseUrl: this.config.environment.fmeServerBaseUrl,
-					fmeServerToken: this.config.environment.fmeServerToken
+					fmeServerToken: this.config.environment.fmeServerToken,
+					makeSmallCallback: this.makeSmall,
+					makeTallCallback: this.makeTall,
 				});
 			},
 
 			onOpen: function () {
-				var wm = WidgetManager.getInstance();
 
-				alert("minimizeWidget!");
-				wm.minimizeWidget(this);
+			},
 
-				// alert("closeWidget!");
-				// wm.closeWidget(this);
+			makeSmall: function() {
+				var pm = PanelManager.getInstance();
+				pm.minimizePanel(this.id + "_panel");
+			},
 
-				// alert("destroyWidget!");
-				// wm.destroyWidget(this);
+			makeTall: function() {
 
+				var vs = dojoWindow.getBox();
+				console.log("Breite/Höhe: " + vs.w + "/" + vs.h);
+
+				var pm = PanelManager.getInstance();
+				pm.maximizePanel(this.id + "_panel");
 			},
 
 
@@ -43,9 +57,9 @@ define([
 			//   console.log('onClose');
 			// },
 
-			// onMinimize: function(){
-			//   console.log('onMinimize');
-			// },
+			onMinimize: function(){
+			  console.log('onMinimize');
+			},
 
 			// onMaximize: function(){
 			//   console.log('onMaximize');
