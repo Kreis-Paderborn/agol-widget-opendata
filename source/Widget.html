@@ -21,6 +21,45 @@
 
 		<!-- div class="jimu-btn last-btn" >Clear</div> -->
 
+		Tragen Sie in der Karte die Fläche ein, für den Sie den Bestandsdatenauszug erstellen möchten. Aktivieren Sie dazu den Zeichenmodus, indem Sie die Schaltfläche "Bereich zeichnen" anklicken. 
+		<table cellspacing="5" style="width:100%;">
+			<tbody>
+				
+				
+				<tr data-dojo-attach-point="titleTr">
+					<td style="width:65px;">
+
+					</td>
+					<td align=right>
+						<input type="button" id="drawButton" class="map-id" value="'Bereich zeichnen' starten" name="activate">&nbsp;&nbsp;
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		Durch Doppelklick wird die Fläche abgeschlossen und auf Gültigkeit geprüft.<br/>
+		Weiter unten in der Meldungsbox erscheint das Prüfergebnis. Wenn die Fläche nicht in Ordnung sein sollte, aktivieren Sie bitte den Zeichenmodus erneut und zeichnen eine neue Fläche.<br/>
+		
+		<table cellspacing="5" style="width:100%;">
+			<tbody>
+				<tr data-dojo-attach-point="titleTr">
+					<td style="width:65px;">
+						Ergebnis:
+					</td>
+					<td>
+						<textarea style="height:100px;" id="dijitTextarea">?? - Gültiges Anfragepolygon    ?? - Maximale Größe eingehalten ?? - Anfrage innerhalb KPB</textarea>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+
+		Durch Doppelklick wird die Fläche abgeschlossen und auf Gültigkeit geprüft.<br/>
+		Weiter unten in der Meldungsbox erscheint das Prüfergebnis. Wenn die Fläche nicht in Ordnung sein sollte, aktivieren Sie bitte den Zeichenmodus erneut und zeichnen eine neue Fläche.<br/>
+		<br>
+		<br>
+		Durch Doppelklick wird die Fläche abgeschlossen und auf Gültigkeit geprüft.<br/>
+		Weiter unten in der Meldungsbox erscheint das Prüfergebnis. Wenn die Fläche nicht in Ordnung sein sollte, aktivieren Sie bitte den Zeichenmodus erneut und zeichnen eine neue Fläche.<br/>
+		
+
 		<table cellspacing="5" style="width:100%;">
 			<tbody>
 				<tr data-dojo-attach-point="titleTr">
@@ -30,29 +69,6 @@
 					<td>
 						<input id="opt_requesteremail">
 						</textarea>
-					</td>
-				</tr>
-				<tr data-dojo-attach-point="titleTr">
-					<td style="width:65px;">
-						&nbsp;
-					</td>
-					<td>
-					</td>
-				</tr>
-				<tr data-dojo-attach-point="titleTr">
-					<td style="width:65px;">
-
-					</td>
-					<td align=right>
-						<input type="button" id="drawButton" class="map-id" value="'Bereich zeichnen' starten" name="activate">&nbsp;&nbsp;
-					</td>
-				</tr>
-				<tr data-dojo-attach-point="titleTr">
-					<td style="width:65px;">
-						Ergebnis:
-					</td>
-					<td>
-						<textarea style="height:100px;" id="dijitTextarea">?? - Gültiges Anfragepolygon    ?? - Maximale Größe eingehalten ?? - Anfrage innerhalb KPB</textarea>
 					</td>
 				</tr>
 				<tr data-dojo-attach-point="titleTr">

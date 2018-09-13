@@ -45,17 +45,18 @@ define([
 
 			makeTall: function() {
 
-				var vs = dojoWindow.getBox();
-				console.log("Breite/Höhe: " + vs.w + "/" + vs.h);
+				// var vs = dojoWindow.getBox();
+				// console.log("Breite/Höhe: " + vs.w + "/" + vs.h);
 
 				var pm = PanelManager.getInstance();
 				pm.maximizePanel(this.id + "_panel");
 			},
 
 
-			// onClose: function(){
-			//   console.log('onClose');
-			// },
+			onClose: function(){
+			  var pm = PanelManager.getInstance();
+				pm.destroyPanel(this.id + "_panel");
+			},
 
 			onMinimize: function(){
 			  console.log('onMinimize');

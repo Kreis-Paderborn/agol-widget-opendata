@@ -75,17 +75,17 @@ define([
                     onFocus: function () {
                         console.log("textarea focus handler");
 
-                        this.makeSmallCallback();
+                    //    me.makeSmallCallback();
                     },
                     onBlur: function () { 
-                        this.makeTallCallback();
+                     //   me.makeTallCallback();
                      },
                     selectOnClick: true
                 }, "dijitTextarea");
                 textarea.startup();
 
                 var emailTextbox = new dijitValidationTextBox({
-                    style: "width:248px;",
+                    //style: "width:220px;",
                     required: true,
                     promptMessage: "Bitte eMail eingeben.",
                     missingMessage: "Es muss eine eMail angegeben werden.",
@@ -172,7 +172,9 @@ define([
                 drawButton.name = "activate";
                 drawButton.value = "'Bereich zeichnen' starten";
 
-                this.makeTallCallback();
+                if (window.appInfo.isRunInMobile) {
+                    this.makeTallCallback();
+                }
 
                 this.map.enableMapNavigation();
                 this.draw.deactivate();
@@ -184,7 +186,10 @@ define([
                 drawButton.name = "deactivate";
                 drawButton.value = "'Bereich zeichnen' läuft...";
 
-                this.makeSmallCallback();
+                if (window.appInfo.isRunInMobile) {
+                    this.makeSmallCallback();
+                }
+                
 
 
                 var textarea = window.document.getElementById("dijitTextarea");
