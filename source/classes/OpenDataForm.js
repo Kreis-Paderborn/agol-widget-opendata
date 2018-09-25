@@ -75,11 +75,11 @@ define([
                     onFocus: function () {
                         console.log("textarea focus handler");
 
-                    //    me.makeSmallCallback();
+                        //    me.makeSmallCallback();
                     },
-                    onBlur: function () { 
-                     //   me.makeTallCallback();
-                     },
+                    onBlur: function () {
+                        //   me.makeTallCallback();
+                    },
                     selectOnClick: true
                 }, "dijitTextarea");
                 textarea.startup();
@@ -168,18 +168,29 @@ define([
             },
 
             stopDrawing: function () {
+
                 var drawButton = window.document.getElementById("drawButton");
-                drawButton.name = "activate";
-                drawButton.value = "'Bereich zeichnen' starten";
+                if (drawButton) {
+                    drawButton.name = "activate";
+                    drawButton.value = "'Bereich zeichnen' starten";
+                }
 
                 if (window.appInfo.isRunInMobile) {
                     this.makeTallCallback();
                 }
 
                 this.map.enableMapNavigation();
-                this.draw.deactivate();
+                this.deactivateDrawingTool();
             },
 
+            /**
+             * Der Aufruf zum Deaktivieren der Zeichenfunktion
+             * wird in einer eigenen Methode angeboten, um dies
+             * auch von außen aufreufen zu können.
+             */
+            deactivateDrawingTool: function () {
+                this.draw.deactivate();
+            },
 
             startDrawing: function () {
                 var drawButton = window.document.getElementById("drawButton");
@@ -189,7 +200,7 @@ define([
                 if (window.appInfo.isRunInMobile) {
                     this.makeSmallCallback();
                 }
-                
+
 
 
                 var textarea = window.document.getElementById("dijitTextarea");

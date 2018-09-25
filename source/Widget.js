@@ -18,6 +18,7 @@ define([
 			// Custom widget code goes here
 
 			baseClass: 'jimu-widget-widget-at',
+			form: null,
 
 			startup: function () {
 				this.inherited(arguments);
@@ -26,7 +27,7 @@ define([
 				this.makeTall = lang.hitch(this, this.makeTall);
 
 
-				var form = new OpenDataForm(this.map, {
+				this.form = new OpenDataForm(this.map, {
 					fmeServerBaseUrl: this.config.environment.fmeServerBaseUrl,
 					fmeServerToken: this.config.environment.fmeServerToken,
 					makeSmallCallback: this.makeSmall,
@@ -38,28 +39,44 @@ define([
 
 			},
 
-			makeSmall: function() {
+			makeSmall: function () {
 				var pm = PanelManager.getInstance();
 				pm.minimizePanel(this.id + "_panel");
 			},
 
-			makeTall: function() {
+			makeTall: function () {
 
 				// var vs = dojoWindow.getBox();
 				// console.log("Breite/Höhe: " + vs.w + "/" + vs.h);
 
 				var pm = PanelManager.getInstance();
+				var aPanel = pm.getPanelById(this.id + "_panel");
+				console.log("PANEL:");
+				console.log(aPanel);
 				pm.maximizePanel(this.id + "_panel");
 			},
 
+			/**
+			 * Wird beim Schließen des Panels aufgerufen.
+			 * Entweder durch die Schaltfläche in der Toolbar
+			 * oder durch das "X" in der Titelleiste des Panels selbst.
+			 */
+			onClose: function () {
 
-			onClose: function(){
-			  var pm = PanelManager.getInstance();
+				// Abbruch der evtl. gestarteten Interaktionen
+				// mit der Karte und dem Zeichnwerkzeug
+				this.map.enableMapNavigation();
+				this.map.graphics.clear();
+				this.form.deactivateDrawingTool();
+
+				// Zerstören der Panel-Instanz, damit beim
+				// nächsten Start sicher alles zurück gesetzt ist.
+				var pm = PanelManager.getInstance();
 				pm.destroyPanel(this.id + "_panel");
 			},
 
-			onMinimize: function(){
-			  console.log('onMinimize');
+			onMinimize: function () {
+				console.log('onMinimize');
 			},
 
 			// onMaximize: function(){
