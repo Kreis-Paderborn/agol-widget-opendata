@@ -8,7 +8,6 @@ define([
     'esri/toolbars/draw',
     'esri/graphic',
     'esri/request',
-    'dijit/form/Textarea',
     'dijit/form/ValidationTextBox',
     'dojo/domReady!',
     'dojox/form/BusyButton',
@@ -24,7 +23,6 @@ define([
     Draw,
     Graphic,
     esriRequest,
-    dijitTextarea,
     dijitValidationTextBox,
     dijitReady,
     BusyButton,
@@ -41,12 +39,19 @@ define([
             wktPolygon: null,
             makeSmallCallback: null,
             makeTallCallback: null,
+            drawInMobileMode: false,
 
+            // Status für Formular
+            polygonValid: false,
+            emailValid: false,
 
+            // Texte für Prüfergebnis der Flächenprüfung
+            POLYGON_DEFAULT: "Keine Fläche vorhanden.",
+            POLYGON_INVALID: "Das eingezeichnete Anfragepolygon ist ungültig.",
+            POLYGON_VALID: "Ok.",
+            POLYGON_OUTSIDE_KPB: "Das Anfragepolygon muss innerhalb der Kreisgrenze liegen.",
+            POLYGON_TO_LARGE: "Die maximale Größe wurde nicht eingehalten.",
 
-            textAreaDefaultText: "?? - Gültiges Anfragepolygon    ?? - Maximale Größe eingehalten ?? - Anfrage innerhalb KPB",
-
-            textAreaLoadingText: "%% - Gültiges Anfragepolygon    %% - Maximale Größe eingehalten %% - Anfrage innerhalb KPB",
 
             constructor: function (map, options) {
 
@@ -63,26 +68,9 @@ define([
 
                 var me = this;
 
-
-
-
-
-                var textarea = new dijitTextarea({
-                    rows: 6,
-                    cols: 32,
-                    style: "width:auto;",
-                    wrap: "hard",
-                    onFocus: function () {
-                        console.log("textarea focus handler");
-
-                        //    me.makeSmallCallback();
-                    },
-                    onBlur: function () {
-                        //   me.makeTallCallback();
-                    },
-                    selectOnClick: true
-                }, "dijitTextarea");
-                textarea.startup();
+                var pruefergebnisDiv = window.document.getElementById("pruefergebnis");
+                pruefergebnisDiv.innerHTML = this.POLYGON_DEFAULT;
+                pruefergebnisDiv.className = "initial";
 
                 var emailTextbox = new dijitValidationTextBox({
                     //style: "width:220px;",
@@ -91,20 +79,45 @@ define([
                     missingMessage: "Es muss eine eMail angegeben werden.",
                     invalidMessage: "Der eingegeben Wert ist keine gültige eMail-Adresse",
                     regExp: "\\w+([\\.-]?\\w+)*@\\w+([\\.-]?\\w+)*(\\.\\w{2,3})+",
-                    onKeyUp: function () { console.log("email is valid: " + this.isValid()); },
-                    value: "TrantowA@Kreis-Paderborn.de",
+                    onKeyUp: function () {
+                        me.emailValid = this.isValid();
+
+                        dijitRegistry.byId("submitButton").set('disabled', !me.polygonValid || !me.emailValid);
+                    },
+                    value: "", //value: "TrantowA@Kreis-Paderborn.de",
                     name: "opt_requesteremail"
                 }, "opt_requesteremail");
                 emailTextbox.startup();
 
-                var button = new BusyButton({
+
+
+                var drawButton = new BusyButton({
+                    label: "Bereich zeichnen",
+                    busyLabel: "Bereich zeichnen...",
+                    disabled: false,
+                    onClick: function () {
+
+                        // Wir müssem den Button explizit auf "busy" setzen,
+                        // da diese nach dem ersten "Cancel" nicht mehr automatisch
+                        // funktioniert.
+                        drawButton.makeBusy();
+
+                        me.startDrawing();
+                    }
+                }, "drawButton");
+                drawButton.startup();
+
+                var submitButton = new BusyButton({
                     label: "Anfrage absenden",
                     busyLabel: "Anfrage absenden...",
                     //baseClass:"jimu-btn",
                     disabled: true,
                     onClick: function () {
 
-                        button.makeBusy();
+                        // Wir müssem den Button explizit auf "busy" setzen,
+                        // da diese nach dem ersten "Cancel" nicht mehr automatisch
+                        // funktioniert.
+                        submitButton.makeBusy();
 
                         //window.document.getElementById("openDataForm").submit();
                         var request = esriRequest({
@@ -127,15 +140,19 @@ define([
                         request.then(
                             function (response) {
                                 alert("Fertig!");
-                                button.cancel();
+                                submitButton.cancel();
                             },
                             function (error) {
                                 alert("Error: " + error.message);
                             }
                         );
                     }
-                }, "dijitButtonSubmit");
-                button.startup();
+                }, "submitButton");
+                submitButton.startup();
+
+                esri.bundle.toolbars.draw.start = "Klicken, um mit dem Zeichnen zu beginnen";
+                esri.bundle.toolbars.draw.resume = "Klicken, um das Zeichnen fortzusetzen";
+                esri.bundle.toolbars.draw.complete = "Doppelklicken, um abzuschließen";
 
                 this.draw = new Draw(this.map);
 
@@ -148,34 +165,28 @@ define([
                 //this.addGraphic = this.addGraphic.bind(this)
                 this.draw.on("draw-complete", this.addGraphic);
 
+            },
 
-                $('.jimu-widget-widget-at .map-id').click(function () {
+            resetDrawingButton: function () {
+                var drawButton = dijitRegistry.byId("drawButton");
+                drawButton.cancel();
+            },
 
-                    if (this.name === "activate") {
-                        me.startDrawing();
-                        //alert(this.name);
-                        this.name = "deactivate";
-                        this.value = "'Bereich zeichnen' läuft...";
-                    } else {
-                        me.stopDrawing();
-                        // alert(this.name);
-                        this.name = "activate";
-                        this.value = "'Bereich zeichnen' starten";
-                    }
-                });
-
-
+            setAreaResult: function (state, pMessage) {
+                var pruefergebnisDiv = window.document.getElementById("pruefergebnis");
+                if (state==="valid") {
+                    pruefergebnisDiv.className = "submitValid";
+                } else if (state==="invalid") {
+                    pruefergebnisDiv.className = "submitInvalid";
+                } else if (state==="initial") {
+                    pruefergebnisDiv.className = "submitInitial";
+                } 
+                pruefergebnisDiv.innerHTML = pMessage;
             },
 
             stopDrawing: function () {
 
-                var drawButton = window.document.getElementById("drawButton");
-                if (drawButton) {
-                    drawButton.name = "activate";
-                    drawButton.value = "'Bereich zeichnen' starten";
-                }
-
-                if (window.appInfo.isRunInMobile) {
+                if (this.drawInMobileMode) {
                     this.makeTallCallback();
                 }
 
@@ -193,18 +204,15 @@ define([
             },
 
             startDrawing: function () {
-                var drawButton = window.document.getElementById("drawButton");
-                drawButton.name = "deactivate";
-                drawButton.value = "'Bereich zeichnen' läuft...";
 
-                if (window.appInfo.isRunInMobile) {
+                this.drawInMobileMode = (window.innerWidth < 1000);
+                if (this.drawInMobileMode) {
                     this.makeSmallCallback();
                 }
 
-
-
-                var textarea = window.document.getElementById("dijitTextarea");
-                textarea.value = this.textAreaDefaultText;
+                var pruefergebnisDiv = window.document.getElementById("pruefergebnis");
+                pruefergebnisDiv.innerHTML = this.POLYGON_DEFAULT;
+                pruefergebnisDiv.className = "initial";
 
                 this.map.disableMapNavigation();
                 this.map.graphics.clear();
@@ -214,11 +222,7 @@ define([
 
             addGraphic: function (evt) {
                 this.stopDrawing();
-
-                var textarea = window.document.getElementById("dijitTextarea");
-                textarea.value = this.textAreaLoadingText;
-
-
+                var me = this;
 
                 this.map.graphics.add(new Graphic(evt.geometry, this.fillSymbol));
 
@@ -246,46 +250,47 @@ define([
 
                 request.then(
                     function (response) {
-                        var textarea = window.document.getElementById("dijitTextarea");
-                        var submit = true;
-                        //alert("Liegt vollständig in Kreisgrenze: " + response[0].requestPolygonInsideKPB + "Fläche ungültig: " + response[0].requestPolygonInvalid + "zu groß?: " + response[0].requestPolygonToLarge);
-
-
+                        var polygonValid = true;
 
                         if (response[0].requestPolygonInvalid == 1) {
-                            textarea.value = "!! - Gültiges Anfragepolygon    ";
-                            submit = false;
+                            me.setAreaResult("invalid", me.POLYGON_INVALID)
+                            polygonValid = false;
                         } else if (response[0].requestPolygonInvalid == 0) {
-                            textarea.value = "ok - Gültiges Anfragepolygon    "
+                            me.setAreaResult("valid", me.POLYGON_VALID)
                         } else {
-                            textarea.value = "?? - Gültiges Anfragepolygon    ";
-                            submit = false;
+                            polygonValid = false;
                         }
 
                         if (response[0].requestPolygonToLarge == 1) {
-                            textarea.value += "!! - Maximale Größe eingehalten ";
-                            submit = false;
+                            me.setAreaResult("invalid", me.POLYGON_TO_LARGE)
+                            polygonValid = false;
                         } else if (response[0].requestPolygonToLarge == 0) {
-                            textarea.value += "ok - Maximale Größe eingehalten "
+
+                            if (response[0].requestPolygonOutsideKPB == 1) {
+                                me.setAreaResult("invalid", me.POLYGON_OUTSIDE_KPB)
+                                polygonValid = false;
+                            } else if (response[0].requestPolygonOutsideKPB == 0) {
+                                me.setAreaResult("valid", me.POLYGON_VALID)
+                            } else {
+                                polygonValid = false;
+                            }
+
                         } else {
-                            textarea.value += "?? - Maximale Größe eingehalten ";
-                            submit = false;
+                            polygonValid = false;
                         }
 
-                        if (response[0].requestPolygonOutsideKPB == 1) {
-                            textarea.value += "!! - Anfrage innerhalb KPB";
-                            submit = false;
-                        } else if (response[0].requestPolygonOutsideKPB == 0) {
-                            textarea.value += "ok - Anfrage innerhalb KPB"
-                        } else {
-                            textarea.value += "?? - Anfrage innerhalb KPB";
-                            submit = false;
-                        }
 
-                        dijitRegistry.byId("dijitButtonSubmit").set('disabled', !submit);
+
+                        me.polygonValid = polygonValid;
+
+                        dijitRegistry.byId("submitButton").set('disabled', !me.polygonValid || !me.emailValid);
+                        me.resetDrawingButton();
+
                     },
                     function (error) {
-                        alert("Error: " + error.message);
+                        me.resetDrawingButton();
+                        me.setAreaResult("invalid", error.message)
+
                     }
                 );
 

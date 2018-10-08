@@ -1,3 +1,14 @@
-.jimu-widget-widget-at div:first-child{
+.submitInitial{
+  
+  font-size: medium;
+}
+
+.submitValid{
+  color: green;
+  font-size: medium;
+}
+
+.submitInvalid{
   color: red;
+  font-size: medium;
 }
