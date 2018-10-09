@@ -1,14 +1,39 @@
-.submitInitial{
-  
+
+.jimu-widget-widget-opendata-main .submitInitial{
   font-size: medium;
+
+  height:60px; 
+  word-break: break-word;
+  overflow: auto;
+  border: 1px solid gainsboro;
 }
 
-.submitValid{
+.jimu-widget-widget-opendata-main .submitValid{
   color: green;
   font-size: medium;
+
+  height:60px; 
+  word-break: break-word;
+  overflow: auto;
+  border: 1px solid gainsboro;
 }
 
-.submitInvalid{
+.jimu-widget-widget-opendata-main .submitInvalid{
   color: red;
   font-size: medium;
+
+  height:60px; 
+  word-break: break-word;
+  overflow: auto;
+  border: 1px solid red;
 }
+
+.jimu-widget-widget-opendata-main .tableHeading{
+  height: 35px;
+  vertical-align: center;
+}
+
+.jimu-widget-widget-opendata-main table{
+  width: 100%;
+}
+

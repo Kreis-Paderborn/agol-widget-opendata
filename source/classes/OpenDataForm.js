@@ -61,19 +61,13 @@ define([
                 this.makeSmallCallback = options.makeSmallCallback;
                 this.makeTallCallback = options.makeTallCallback;
 
-
-
                 // specify class defaults
                 this.fillSymbol = options.fillSymbol || new SimpleFillSymbol("solid", new SimpleLineSymbol("solid", new Color([232, 104, 80]), 2), new Color([232, 104, 80, 0.25]));
+                this.setAreaResult("initial", this.POLYGON_DEFAULT);
 
                 var me = this;
-
-                var pruefergebnisDiv = window.document.getElementById("pruefergebnis");
-                pruefergebnisDiv.innerHTML = this.POLYGON_DEFAULT;
-                pruefergebnisDiv.className = "initial";
-
                 var emailTextbox = new dijitValidationTextBox({
-                    //style: "width:220px;",
+                    style: "width:100%",
                     required: true,
                     promptMessage: "Bitte eMail eingeben.",
                     missingMessage: "Es muss eine eMail angegeben werden.",
@@ -210,9 +204,7 @@ define([
                     this.makeSmallCallback();
                 }
 
-                var pruefergebnisDiv = window.document.getElementById("pruefergebnis");
-                pruefergebnisDiv.innerHTML = this.POLYGON_DEFAULT;
-                pruefergebnisDiv.className = "initial";
+                this.setAreaResult("initial", this.POLYGON_DEFAULT);
 
                 this.map.disableMapNavigation();
                 this.map.graphics.clear();

@@ -23,12 +23,12 @@
 
 		Tragen Sie in der Karte die Fläche ein, für den Sie den Bestandsdatenauszug erstellen möchten. Aktivieren Sie dazu den Zeichenmodus,
 		indem Sie die Schaltfläche "Bereich zeichnen" anklicken.
-		<table cellspacing="5" style="width:100%;">
+		<table cellspacing="0">
 			<tbody>
 
 
 				<tr data-dojo-attach-point="titleTr">
-					<td style="width:65px;">
+					<td>
 
 					</td>
 					<td align=right>
@@ -38,58 +38,65 @@
 				</tr>
 			</tbody>
 		</table>
-		Durch Doppelklick wird die Fläche abgeschlossen und auf Gültigkeit geprüft.
-		<br/>Wenn die Fläche nicht in Ordnung sein sollte, aktivieren Sie
-		bitte den Zeichenmodus erneut und zeichnen eine neue Fläche.
+		Nach Abschluss des Zeichnens wird die eingetragene Fläche auf Gültigkeit geprüft.
+		<br/>Wenn die Fläche nicht in Ordnung sein sollte, aktivieren Sie bitte den Zeichenmodus erneut und zeichnen eine neue Fläche.
 		<br/>
 
-		<table cellspacing="5" style="width:100%;">
+		<table cellspacing="0">
 			<tbody>
 				<tr data-dojo-attach-point="titleTr">
-					<td style="width:65px;">
-						Prüfergebnis:
+					<td class="tableHeading">
+						<u>Ergebnis der Flächenprüfung:</u>
 					</td>
-					
+
 				</tr>
 				<tr data-dojo-attach-point="titleTr">
-					
-						<td>
-							<div style="height:60px; word-break: break-word;overflow: auto;" id="pruefergebnis"/>
-						</td>
-					</tr>
+
+					<td>
+						<div id="pruefergebnis" />
+
+					</td>
+				</tr>
+				<tr data-dojo-attach-point="titleTr">
+					<td>
+						&nbsp;
+					</td>
+					<td>
+					</td>
+				</tr>
 			</tbody>
 		</table>
 
-		Durch Doppelklick wird die Fläche abgeschlossen und auf Gültigkeit geprüft.
-		<br/>Wenn die Fläche nicht in Ordnung sein sollte, aktivieren Sie
-		bitte den Zeichenmodus erneut und zeichnen eine neue Fläche.
-		<br/>
+		Abhängig von der Flächengröße und andere Faktoren kann die Erstellung der Datenabgabe eine Zeit von wenigen Sekunden bis
+		mehreren Minuren in Anspruch nehmen. Daher ist das Ergebnis nicht in dier Oberfläche abrufbar. Es wird stattdessen ein
+		Download-Link per eMail versandt. Dafür benötigen wir Ihre eMail-Adresse.
 		<br>
-		<br> Durch Doppelklick wird die Fläche abgeschlossen und auf Gültigkeit geprüft.
-		<br/> Weiter unten in der Meldungsbox erscheint das Prüfergebnis. Wenn die Fläche nicht in Ordnung sein sollte, aktivieren Sie
-		bitte den Zeichenmodus erneut und zeichnen eine neue Fläche.
-		<br/>
+		<br>
+		<b>Datenschutz:</b> Die eMail-Adresse wird nur für den oben beschriebenen Zweck verwendet, nicht gespeichert und nicht an
+		Dritte weitergegeben. Aus technischen Gründen ist die eMail-Adresse in internen Serverprotokollen eine Zeit lang einsehbar.
+		Diese Protokolle werden binnen vier Wochen entgültig gelöscht.
 
-
-		<table cellspacing="5" style="width:100%;">
+		<table cellspacing="0">
 			<tbody>
 				<tr data-dojo-attach-point="titleTr">
-					<td style="width:65px;">
-						E-Mail:
+					<td class="tableHeading">
+						<u>E-Mail:</u>
 					</td>
-					<td>
+				</tr>
+				<tr data-dojo-attach-point="titleTr">
+					<td colspan="2">
 						<input id="opt_requesteremail">
 					</td>
 				</tr>
 				<tr data-dojo-attach-point="titleTr">
-					<td style="width:65px;">
+					<td>
 						&nbsp;
 					</td>
 					<td>
 					</td>
 				</tr>
 				<tr data-dojo-attach-point="titleTr">
-					<td style="width:65px;">
+					<td>
 
 					</td>
 					<td align=right>
