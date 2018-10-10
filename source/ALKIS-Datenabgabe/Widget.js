@@ -47,8 +47,11 @@ define([
 
 				if (data.drawState === 'finished') {
 					if (this.form.draw._points.length < 3) {
-
-						this.form.setAreaResult("invalid", this.form.POLYGON_INVALID)
+						if (this.form.draw._points.length === 0) {
+							this.form.setAreaResult("invalid", this.form.POLYGON_NO_INTERACTION)
+						} else {
+							this.form.setAreaResult("invalid", this.form.POLYGON_INVALID)
+						}
 						this.form.resetDrawingButton();
 						this.form.stopDrawing();
 

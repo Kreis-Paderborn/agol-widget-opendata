@@ -48,7 +48,8 @@ define([
             // Texte für Prüfergebnis der Flächenprüfung
             POLYGON_DEFAULT: "Keine Fläche vorhanden.",
             POLYGON_INVALID: "Das eingezeichnete Anfragepolygon ist ungültig.",
-            POLYGON_VALID: "Ok.",
+            POLYGON_VALID: "Das eingezeichnete Anfragepolygon ist in Ordnung.",
+            POLYGON_NO_INTERACTION: "Es wurde keine Geometrie gezeichnet. Setzen Sie durch Tippen in die Karte mindestens 3 Punkte um ein Polygon festzulegen.",
             POLYGON_OUTSIDE_KPB: "Das Anfragepolygon muss innerhalb der Kreisgrenze liegen.",
             POLYGON_TO_LARGE: "Die maximale Größe wurde nicht eingehalten.",
 

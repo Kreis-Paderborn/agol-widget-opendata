@@ -1,31 +1,37 @@
 
 .jimu-widget-widget-opendata-main .submitInitial{
-  font-size: medium;
+  font-size: 14px;
 
   height:60px; 
   word-break: break-word;
   overflow: auto;
   border: 1px solid gainsboro;
+  padding-left: 10px;
+  padding-top: 5px;
 }
 
 .jimu-widget-widget-opendata-main .submitValid{
   color: green;
-  font-size: medium;
+  font-size: 14px;
 
   height:60px; 
   word-break: break-word;
   overflow: auto;
   border: 1px solid gainsboro;
+  padding-left: 10px;
+  padding-top: 5px;
 }
 
 .jimu-widget-widget-opendata-main .submitInvalid{
-  color: red;
-  font-size: medium;
+  color: #d46464;
+  font-size: 14px;
 
   height:60px; 
   word-break: break-word;
   overflow: auto;
-  border: 1px solid red;
+  border: 1px solid #d46464;
+  padding-left: 10px;
+  padding-top: 5px;
 }
 
 .jimu-widget-widget-opendata-main .tableHeading{

@@ -42,9 +42,7 @@ goto :continue1
         call replace.bat "%PROXY_CONFIG_TARGET_FILE%" ${PRODUCTION_SERVER_URL} %PRODUCTION_SERVER_URL%
         call replace.bat "%PROXY_CONFIG_TARGET_FILE%" ${FME_SERVER_BASE_URL} %FME_SERVER_BASE_URL%
         echo In %PROXY_CONFIG_TARGET_FILE% wurden Ersetzungen vorgenommen.
-    ) ELSE (
-        echo %PROXY_CONFIG_TARGET_FILE% existiert nicht.
-    )
+    ) 
 
 :continue1    
 
