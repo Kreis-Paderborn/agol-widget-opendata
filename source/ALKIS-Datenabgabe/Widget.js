@@ -17,11 +17,12 @@ define([
 		return declare([BaseWidget], {
 			// Custom widget code goes here
 
-			baseClass: 'jimu-widget-widget-at',
+			baseClass: 'jimu-widget-widget-opendata-main',
 			form: null,
 
 			startup: function () {
 				this.inherited(arguments);
+				this.fetchDataByName(this.config.NameOfWidgetToPresentControlsOnMap);
 
 				this.makeSmall = lang.hitch(this, this.makeSmall);
 				this.makeTall = lang.hitch(this, this.makeTall);
@@ -35,6 +36,29 @@ define([
 				});
 			},
 
+			onReceiveData: function (name, widgetId, data, historyData) {
+
+				// Wir hören hier nur auf Daten von unserem verknüpften Widget
+				// Es gibt teilweise ungewollte Aufrufe, wo dann aber historyData=undefined
+				// ist. Diese filtern wir auf diese weise aus.				
+				if (name !== this.config.NameOfWidgetToPresentControlsOnMap || (historyData === undefined)) {
+					return;
+				}
+
+				if (data.drawState === 'finished') {
+					if (this.form.draw._points.length < 3) {
+
+						this.form.setAreaResult("invalid", this.form.POLYGON_INVALID)
+						this.form.resetDrawingButton();
+						this.form.stopDrawing();
+
+					} else {
+						this.form.draw.finishDrawing();
+					}
+				}
+
+			},
+
 			onOpen: function () {
 
 			},
@@ -42,6 +66,10 @@ define([
 			makeSmall: function () {
 				var pm = PanelManager.getInstance();
 				pm.minimizePanel(this.id + "_panel");
+
+				this.publishData({
+					drawState: 'start'
+				});
 			},
 
 			makeTall: function () {
@@ -51,9 +79,11 @@ define([
 
 				var pm = PanelManager.getInstance();
 				var aPanel = pm.getPanelById(this.id + "_panel");
-				console.log("PANEL:");
-				console.log(aPanel);
 				pm.maximizePanel(this.id + "_panel");
+
+				this.publishData({
+					drawState: 'cancel'
+				});
 			},
 
 			/**
@@ -68,6 +98,11 @@ define([
 				this.map.enableMapNavigation();
 				this.map.graphics.clear();
 				this.form.deactivateDrawingTool();
+
+				// Entferne auch die Schaltflächen für das erweiterte Zeichnen
+				this.publishData({
+					drawState: 'cancel'
+				});
 
 				// Zerstören der Panel-Instanz, damit beim
 				// nächsten Start sicher alles zurück gesetzt ist.

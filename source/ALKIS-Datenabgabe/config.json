@@ -1,7 +1,7 @@
 {
-    "configText":"Test!",
     "environment": {
         "fmeServerToken" : "${FME_SERVER_TOKEN}",
         "fmeServerBaseUrl" : "${FME_SERVER_BASE_URL}"
-    }
+    },
+    "NameOfWidgetToPresentControlsOnMap": "ALKIS-Datenabgabe-Touch"
 }

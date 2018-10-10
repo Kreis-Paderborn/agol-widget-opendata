@@ -1,5 +1,5 @@
 {
-  "name": "OpenData Liegenschaftskarte",
+  "name": "ALKIS-Datenabgabe-Touch",
   "2D": true,
   "3D": false,
   "platform": "HTML",
@@ -10,7 +10,7 @@
   "copyright": "(c) Kreis Paderborn",
   "license": "MIT License",
   "properties": {
-		"inPanel":true,
+		"inPanel":false,
 		"hasLocale": true,
 		"hasStyle":true,
 		"hasConfig":true,
@@ -19,6 +19,6 @@
 		"hasSettingUIFile":true,
 		"hasSettingLocale":true,
 		"hasSettingStyle":true,
-		"IsController":false
+		"IsController":false		
   }
 }
