@@ -17,47 +17,52 @@ define([
 		return declare([BaseWidget], {
 			// Custom widget code goes here
 
-			baseClass: 'jimu-widget-widget-opendata-drawing-extension',
+			baseClass: 'jimu-widget-widget-opendata-touch',
 			drawFinishButton: null,
+			drawAbortButton: null,
+			drawStatusText: null,
 
 			startup: function () {
 				this.inherited(arguments);
 				this.fetchDataByName(this.config.NameOfMainWidget);
 
 				var me = this;
+				this.drawFinishButton = window.document.getElementById("finishDrawing");
+				this.drawAbortButton = window.document.getElementById("abortDrawing");
+				this.drawStatusText = window.document.getElementById("statusText");
 
-				this.drawFinishButton = new BusyButton({
-                    label: "Zeichnen abschließen",
-					busyLabel: "Zeichnen abschließen...",
-					timeout: 500,
-                    //baseClass:"jimu-btn",
-					disabled: false,
-					style: "visibility: hidden",
-                    onClick: function () {
 
-						me.publishData({
-							drawState: 'finished'
-						  }, false);
-						this.set("style","visibility: hidden");
-                    }
-                }, "drawFinish");
-                this.drawFinishButton.startup();
+				this.drawFinishButton.onclick = function () {
+					me.publishData({
+						drawState: 'finished'
+					}, false);
+				}
+
+				this.drawAbortButton.onclick = function () {
+					me.publishData({
+						drawState: 'cancel'
+					}, false);
+				}
 			},
 
-			onReceiveData: function(name, widgetId, data, historyData) {
+			onReceiveData: function (name, widgetId, data, historyData) {
 				//filter out messages
-				if(name !== this.config.NameOfMainWidget){
-				  return;
+				if (name !== this.config.NameOfMainWidget) {
+					return;
 				}
-		
+
 				if (data.drawState === "start") {
-					this.drawFinishButton.set("style","visibility: visible");
-				} 
+					this.drawFinishButton.style = "visibility: visible";
+					this.drawAbortButton.style = "visibility: visible";
+					this.drawStatusText.style = "visibility: visible";
+				}
 				if (data.drawState === "cancel") {
-					this.drawFinishButton.set("style","visibility: hidden");
-				} 
-		
-			  },
+					this.drawFinishButton.style = "visibility: hidden";
+					this.drawAbortButton.style = "visibility: hidden";
+					this.drawStatusText.style = "visibility: hidden";
+				}
+
+			},
 
 			// onOpen: function () {
 			// },
@@ -72,7 +77,7 @@ define([
 			// },
 
 			// onMinimize: function () {
-				
+
 			// },
 
 			// onMaximize: function(){

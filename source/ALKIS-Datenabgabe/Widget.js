@@ -20,6 +20,7 @@ define([
 			baseClass: 'jimu-widget-widget-opendata-main',
 			form: null,
 
+
 			startup: function () {
 				this.inherited(arguments);
 				this.fetchDataByName(this.config.NameOfWidgetToPresentControlsOnMap);
@@ -27,13 +28,28 @@ define([
 				this.makeSmall = lang.hitch(this, this.makeSmall);
 				this.makeTall = lang.hitch(this, this.makeTall);
 
-
 				this.form = new OpenDataForm(this.map, {
 					fmeServerBaseUrl: this.config.environment.fmeServerBaseUrl,
 					fmeServerToken: this.config.environment.fmeServerToken,
 					makeSmallCallback: this.makeSmall,
 					makeTallCallback: this.makeTall,
 				});
+
+				// Definiere eine globale Variable, um festzustellen ob
+				// der Anwender ein Gerät mit Touch benutzt. 
+				// Achtung: der Wert kann frühestens nach der ersten Benutzerinteraktion
+				// auf TRUE gesetzt sein.
+				window.userIsTouching = false;
+				window.addEventListener('touchstart', function onFirstTouch() {
+					// we could use a class
+					window.userIsTouching = true;
+
+					// we only need to know once that a human touched the screen, so we can stop listening now
+					window.removeEventListener('touchstart', onFirstTouch, false);
+				}, false);
+
+
+
 			},
 
 			onReceiveData: function (name, widgetId, data, historyData) {
@@ -59,12 +75,16 @@ define([
 						this.form.draw.finishDrawing();
 					}
 				}
+				if (data.drawState === 'cancel') {
+					this.form.resetDrawingButton();
+					this.form.stopDrawing();
+				}
 
 			},
 
-			onOpen: function () {
-
-			},
+			// onOpen: function () {
+			//   console.log('onOpen');
+			// },
 
 			makeSmall: function () {
 				var pm = PanelManager.getInstance();

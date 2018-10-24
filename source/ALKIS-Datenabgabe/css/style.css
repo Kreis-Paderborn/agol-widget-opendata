@@ -2,7 +2,7 @@
 .jimu-widget-widget-opendata-main .submitInitial{
   font-size: 14px;
 
-  height:60px; 
+  height:64px; 
   word-break: break-word;
   overflow: auto;
   border: 1px solid gainsboro;
@@ -14,7 +14,7 @@
   color: green;
   font-size: 14px;
 
-  height:60px; 
+  height:64px; 
   word-break: break-word;
   overflow: auto;
   border: 1px solid gainsboro;
@@ -23,10 +23,10 @@
 }
 
 .jimu-widget-widget-opendata-main .submitInvalid{
-  color: #d46464;
+  color: #ac3030;
   font-size: 14px;
 
-  height:60px; 
+  height:64px; 
   word-break: break-word;
   overflow: auto;
   border: 1px solid #d46464;

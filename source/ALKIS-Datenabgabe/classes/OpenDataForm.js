@@ -145,11 +145,23 @@ define([
                 }, "submitButton");
                 submitButton.startup();
 
+                // Festlegen, welche Positionen für Meldungs-Popups 
+                // der ValidationTextbox möglich sein sollen
+                dijit.Tooltip.defaultPosition = ['above','below'];
+
+                // Um die Hinweise beim Zeichnen auf jeden Fall in Deutsch zu haben
+                // werden sie hier explizit definiert. Sonst sind sie bei mir aktuell
+                // im FF auf deutsch und im Chrome auf englisch.
                 esri.bundle.toolbars.draw.start = "Klicken, um mit dem Zeichnen zu beginnen";
                 esri.bundle.toolbars.draw.resume = "Klicken, um das Zeichnen fortzusetzen";
                 esri.bundle.toolbars.draw.complete = "Doppelklicken, um abzuschließen";
 
-                this.draw = new Draw(this.map);
+                this.draw = new Draw(this.map, { 
+                    showTooltips: true
+                 });
+
+                // Hier kann der Stil während des Zeichnens definiert werden
+                // this.draw.fillSymbol = this.fillSymbol;
 
                 // addGraphic is called by an external function, esriRequest
                 // hitch() is used to provide the proper context so that addGraphic
@@ -200,14 +212,19 @@ define([
 
             startDrawing: function () {
 
-                this.drawInMobileMode = (window.innerWidth < 1000);
+                // Die Mobil-Variante wird geschaltet, wenn entweder zu wenig 
+                // Platz auf dem Bildschirm ist oder ein Gerät mit Touch-Bedienung
+                // verwendet wird.
+                this.drawInMobileMode = (window.innerWidth < 1000) || window.userIsTouching;
                 if (this.drawInMobileMode) {
                     this.makeSmallCallback();
                 }
 
                 this.setAreaResult("initial", this.POLYGON_DEFAULT);
 
-                this.map.disableMapNavigation();
+                //Ist die Frage, ob man während dem Zeichnen
+                //die Karte bewegen könnne soll oder nicht.
+                //this.map.disableMapNavigation();
                 this.map.graphics.clear();
                 this.wktPolygon = undefined;
                 this.draw.activate('polygon');
@@ -217,6 +234,7 @@ define([
                 this.stopDrawing();
                 var me = this;
 
+                // Hier wird der Stil für die abgeschlossene Grafik gesetzt
                 this.map.graphics.add(new Graphic(evt.geometry, this.fillSymbol));
 
                 var myWKT = "POLYGON ((";

@@ -1,3 +1,33 @@
-.jimu-widget-widget-opendata-drawing-extension .sample{
-  color: blue;
+.jimu-widget-widget-opendata-touch .overlayButton{
+  border-radius: 5px;
+  width: 50px;
+  height: 50px;
+  margin-right: 7px;
+  border: solid white 2px;
+  padding-bottom: -20px;
+  background-color: #aaa;
+  opacity: 0.9; 
+  float: left;
+  color: white;
+  text-align: center;
+  vertical-align: bottom;
+  font-weight: bold;
+  font-size: 40px;
+  cursor: pointer;
+  visibility: hidden;
+}
+
+.jimu-widget-widget-opendata-touch .statusText{
+  border-radius: 5px;
+  width: 190px;
+  height: 50px;
+  margin-right: 7px;
+  border: solid #aaa 2px;
+  background-color: white;
+  opacity: 0.9;
+  float: left;
+  /* background: gray url(../images/download-120.png) bottom center no-repeat; */
+  color: black;
+  padding: 2px;
+  visibility: hidden;
 }
