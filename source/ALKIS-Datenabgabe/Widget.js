@@ -54,28 +54,26 @@ define([
 
 			onReceiveData: function (name, widgetId, data, historyData) {
 
-				// Wir hören hier nur auf Daten von unserem verknüpften Widget
+				// Wir hören hier nur auf Daten von unserem verknüpften Widget.
 				// Es gibt teilweise ungewollte Aufrufe, wo dann aber historyData=undefined
-				// ist. Diese filtern wir auf diese weise aus.				
+				// gesetzt ist. Diese filtern wir auf diese weise aus.				
 				if (name !== this.config.NameOfWidgetToPresentControlsOnMap || (historyData === undefined)) {
 					return;
 				}
 
+				// Im Fall des Abschlusses des "Fläche festlegen per Touch"
+				// wird die gezeichnete Fläche verarbeitet und die Oberflächen-
+				// Elemente für das Zeichnen ausgeblendet.
 				if (data.drawState === 'finished') {
-					if (this.form.draw._points.length < 3) {
-						if (this.form.draw._points.length === 0) {
-							this.form.setAreaResult("invalid", this.form.POLYGON_NO_INTERACTION)
-						} else {
-							this.form.setAreaResult("invalid", this.form.POLYGON_INVALID)
-						}
-						this.form.resetDrawingButton();
-						this.form.stopDrawing();
-
-					} else {
-						this.form.draw.finishDrawing();
-					}
+					this.form.processGraphic();
+					this.form.stopDrawing();
 				}
+
+				// Im Fall des Abbruchs des "Fläche festlegen per Touch"
+				// wird die gezeichnete Fläche gelöscht und die Oberflächen-
+				// Elemente für das Zeichnen ausgeblendet.
 				if (data.drawState === 'cancel') {
+					this.map.graphics.clear();
 					this.form.resetDrawingButton();
 					this.form.stopDrawing();
 				}
@@ -118,9 +116,11 @@ define([
 
 				// Abbruch der evtl. gestarteten Interaktionen
 				// mit der Karte und dem Zeichnwerkzeug
-				this.map.enableMapNavigation();
+				// Der Parameter killWodget=true bei stopDrawing
+				// verhindet einen Konflikt zwischen maximizePanel und 
+				// destroyPanel auf dem PanelManager.
 				this.map.graphics.clear();
-				this.form.deactivateDrawingTool();
+				this.form.stopDrawing(true);
 
 				// Entferne auch die Schaltflächen für das erweiterte Zeichnen
 				this.publishData({

@@ -7,7 +7,10 @@ define([
     'esri/symbols/SimpleFillSymbol',
     'esri/toolbars/draw',
     'esri/graphic',
+    'esri/geometry/Point',
+    'esri/geometry/Polygon',
     'esri/request',
+    'esri/geometry/screenUtils',
     'dijit/form/ValidationTextBox',
     'dojo/domReady!',
     'dojox/form/BusyButton',
@@ -22,7 +25,10 @@ define([
     SimpleFillSymbol,
     Draw,
     Graphic,
+    Point,
+    Polygon,
     esriRequest,
+    screenUtils,
     dijitValidationTextBox,
     dijitReady,
     BusyButton,
@@ -36,6 +42,8 @@ define([
             fmeServerBaseUrl: null,
             fmeServerToken: null,
             draw: null,
+            drawnArea: null,
+            mapExtentChangeHandle: null,
             wktPolygon: null,
             makeSmallCallback: null,
             makeTallCallback: null,
@@ -87,8 +95,8 @@ define([
 
 
                 var drawButton = new BusyButton({
-                    label: "Bereich zeichnen",
-                    busyLabel: "Bereich zeichnen...",
+                    label: "Bereich festlegen",
+                    busyLabel: "Bereich festlegen...",
                     disabled: false,
                     onClick: function () {
 
@@ -147,7 +155,7 @@ define([
 
                 // Festlegen, welche Positionen für Meldungs-Popups 
                 // der ValidationTextbox möglich sein sollen
-                dijit.Tooltip.defaultPosition = ['above','below'];
+                dijit.Tooltip.defaultPosition = ['above', 'below'];
 
                 // Um die Hinweise beim Zeichnen auf jeden Fall in Deutsch zu haben
                 // werden sie hier explizit definiert. Sonst sind sie bei mir aktuell
@@ -156,9 +164,9 @@ define([
                 esri.bundle.toolbars.draw.resume = "Klicken, um das Zeichnen fortzusetzen";
                 esri.bundle.toolbars.draw.complete = "Doppelklicken, um abzuschließen";
 
-                this.draw = new Draw(this.map, { 
+                this.draw = new Draw(this.map, {
                     showTooltips: true
-                 });
+                });
 
                 // Hier kann der Stil während des Zeichnens definiert werden
                 // this.draw.fillSymbol = this.fillSymbol;
@@ -181,24 +189,40 @@ define([
 
             setAreaResult: function (state, pMessage) {
                 var pruefergebnisDiv = window.document.getElementById("pruefergebnis");
-                if (state==="valid") {
+                if (state === "valid") {
                     pruefergebnisDiv.className = "submitValid";
-                } else if (state==="invalid") {
+                } else if (state === "invalid") {
                     pruefergebnisDiv.className = "submitInvalid";
-                } else if (state==="initial") {
+                } else if (state === "initial") {
                     pruefergebnisDiv.className = "submitInitial";
-                } 
+                }
                 pruefergebnisDiv.innerHTML = pMessage;
             },
 
-            stopDrawing: function () {
+            stopDrawing: function (killWidget) {
+
+                //Ist die Frage, ob man während dem Zeichnen
+                //die Karte bewegen könnne soll oder nicht.
+                // this.map.enableMapNavigation();
 
                 if (this.drawInMobileMode) {
-                    this.makeTallCallback();
-                }
 
-                this.map.enableMapNavigation();
-                this.deactivateDrawingTool();
+                    // Wenn das Festlegen der Fläche gestoppt wird, weil das ganze
+                    // Widget geschlosen wird, öffnen wir das Panel nicht erneut.
+                    // Diese würde sich mit dem Zerstören des Panels überschneiden und
+                    // in der folgenden Fehlermeldung enden:
+                    // "Cannot read property 'style' of null"
+                    if (!killWidget) {
+                        this.makeTallCallback();
+                    }
+
+                    if (this.mapExtentChangeHandle) {
+                        this.mapExtentChangeHandle.remove();
+                    }
+
+                } else {
+                    this.deactivateDrawingTool();
+                }
             },
 
             /**
@@ -216,99 +240,152 @@ define([
                 // Platz auf dem Bildschirm ist oder ein Gerät mit Touch-Bedienung
                 // verwendet wird.
                 this.drawInMobileMode = (window.innerWidth < 1000) || window.userIsTouching;
-                if (this.drawInMobileMode) {
-                    this.makeSmallCallback();
-                }
+
 
                 this.setAreaResult("initial", this.POLYGON_DEFAULT);
 
                 //Ist die Frage, ob man während dem Zeichnen
                 //die Karte bewegen könnne soll oder nicht.
                 //this.map.disableMapNavigation();
+
                 this.map.graphics.clear();
                 this.wktPolygon = undefined;
-                this.draw.activate('polygon');
+                var me = this;
+
+                if (this.drawInMobileMode) {
+                    this.makeSmallCallback();
+                    this.mapExtentChangeHandle = this.map.on('extent-change', function (data) {
+
+                        // Geografische Koordinanten der BBOX
+                        var xmax = data.extent.xmax;
+                        var ymax = data.extent.ymax;
+                        var xmin = data.extent.xmin;
+                        var ymin = data.extent.ymin;
+                        var wkid = data.extent.spatialReference.wkid;
+
+                        // Forme die Eckpunkte der BBOX in Pixel-Koords um
+                        var screenPointMin = screenUtils.toScreenGeometry(me.map.extent, me.map.width, me.map.height,
+                            new Point({ "x": xmin, "y": ymin, "spatialReference": { "wkid": wkid } }));
+                        var screenPointMax = screenUtils.toScreenGeometry(me.map.extent, me.map.width, me.map.height,
+                            new Point({ "x": xmax, "y": ymax, "spatialReference": { "wkid": wkid } }));
+
+                        // Veränderung der BBOX , damit sie innerhalb der Schaltflächen liegt.
+                        screenPointMax.setY(screenPointMax.y + 70);
+                        screenPointMin.setY(screenPointMin.y - 140);
+                        screenPointMax.setX(screenPointMax.x - 20);
+                        screenPointMin.setX(screenPointMin.x + 57);
+
+                        // Veränderte Eckpunkte werden wieder in Geografische Koordinanten umgeformt
+                        var mapPointMin = screenUtils.toMapGeometry(me.map.extent, me.map.width, me.map.height, screenPointMin);
+                        var mapPointMax = screenUtils.toMapGeometry(me.map.extent, me.map.width, me.map.height, screenPointMax);
+
+                        // Aus den Koords wird eine Esri-Grafik erzeugt und auf die Karte gelegt.
+                        // Die Fläche wird für die spätere Verarbeitung in der Klassen-Variable "drawnArea" gesspeichert.
+                        var polygonJson = {
+                            "rings": [[[mapPointMin.x, mapPointMin.y], [mapPointMin.x, mapPointMax.y], [mapPointMax.x, mapPointMax.y], [mapPointMax.x, mapPointMin.y], [mapPointMin.x, mapPointMin.y]]],
+                            "spatialReference": { "wkid": wkid }
+                        };
+
+                        me.drawnArea = new Polygon(polygonJson);
+                        me.map.graphics.clear();
+                        me.map.graphics.add(new Graphic(me.drawnArea, me.fillSymbol));
+                    });
+
+                    this.map.emit("extent-change", { extent: this.map.extent });
+
+                } else {
+                    this.draw.activate('polygon');
+                }
+
             },
 
             addGraphic: function (evt) {
                 this.stopDrawing();
                 var me = this;
+                this.drawnArea = evt.geometry;
 
                 // Hier wird der Stil für die abgeschlossene Grafik gesetzt
-                this.map.graphics.add(new Graphic(evt.geometry, this.fillSymbol));
+                this.map.graphics.add(new Graphic(this.drawnArea, this.fillSymbol));
 
-                var myWKT = "POLYGON ((";
-                evt.geometry.rings[0].forEach(
-                    function (myPoint) {
-                        myWKT = myWKT + (myPoint[0] + " " + myPoint[1]) + ", ";
-                    }
-                );
-                myWKT = myWKT.substring(0, myWKT.length - 2) + "))";
-                this.wktPolygon = myWKT;
+                this.processGraphic();
 
-                var request = esriRequest({
-                    // Location of the data
-                    url: this.fmeServerBaseUrl + "fmedatastreaming/KPB_OpenData/KPB_Anfrage-Flaeche-pruefen.fmw",
-                    // Service parameters if required, sent with URL as key/value pairs
-                    content: {
-                        paramRequestPolygon: myWKT,
-                        mode: "server",
-                        token: this.fmeServerToken
-                    },
-                    // Data format
-                    handleAs: "json"
-                });
+            },
 
-                request.then(
-                    function (response) {
-                        var polygonValid = true;
+            processGraphic: function () {
+                var me = this;
 
-                        if (response[0].requestPolygonInvalid == 1) {
-                            me.setAreaResult("invalid", me.POLYGON_INVALID)
-                            polygonValid = false;
-                        } else if (response[0].requestPolygonInvalid == 0) {
-                            me.setAreaResult("valid", me.POLYGON_VALID)
-                        } else {
-                            polygonValid = false;
+                if (this.drawnArea && this.drawnArea.rings) {
+                    var myWKT = "POLYGON ((";
+
+
+                    this.drawnArea.rings[0].forEach(
+                        function (myPoint) {
+                            myWKT = myWKT + (myPoint[0] + " " + myPoint[1]) + ", ";
                         }
+                    );
+                    myWKT = myWKT.substring(0, myWKT.length - 2) + "))";
+                    this.wktPolygon = myWKT;
 
-                        if (response[0].requestPolygonToLarge == 1) {
-                            me.setAreaResult("invalid", me.POLYGON_TO_LARGE)
-                            polygonValid = false;
-                        } else if (response[0].requestPolygonToLarge == 0) {
+                    var request = esriRequest({
+                        // Location of the data
+                        url: this.fmeServerBaseUrl + "fmedatastreaming/KPB_OpenData/KPB_Anfrage-Flaeche-pruefen.fmw",
+                        // Service parameters if required, sent with URL as key/value pairs
+                        content: {
+                            paramRequestPolygon: myWKT,
+                            mode: "server",
+                            token: this.fmeServerToken
+                        },
+                        // Data format
+                        handleAs: "json"
+                    });
 
-                            if (response[0].requestPolygonOutsideKPB == 1) {
-                                me.setAreaResult("invalid", me.POLYGON_OUTSIDE_KPB)
+                    request.then(
+                        function (response) {
+                            var polygonValid = true;
+
+                            if (response[0].requestPolygonInvalid == 1) {
+                                me.setAreaResult("invalid", me.POLYGON_INVALID)
                                 polygonValid = false;
-                            } else if (response[0].requestPolygonOutsideKPB == 0) {
+                            } else if (response[0].requestPolygonInvalid == 0) {
                                 me.setAreaResult("valid", me.POLYGON_VALID)
                             } else {
                                 polygonValid = false;
                             }
 
-                        } else {
-                            polygonValid = false;
+                            if (response[0].requestPolygonToLarge == 1) {
+                                me.setAreaResult("invalid", me.POLYGON_TO_LARGE)
+                                polygonValid = false;
+                            } else if (response[0].requestPolygonToLarge == 0) {
+
+                                if (response[0].requestPolygonOutsideKPB == 1) {
+                                    me.setAreaResult("invalid", me.POLYGON_OUTSIDE_KPB)
+                                    polygonValid = false;
+                                } else if (response[0].requestPolygonOutsideKPB == 0) {
+                                    me.setAreaResult("valid", me.POLYGON_VALID)
+                                } else {
+                                    polygonValid = false;
+                                }
+
+                            } else {
+                                polygonValid = false;
+                            }
+
+
+
+                            me.polygonValid = polygonValid;
+
+                            dijitRegistry.byId("submitButton").set('disabled', !me.polygonValid || !me.emailValid);
+                            me.resetDrawingButton();
+
+                        },
+                        function (error) {
+                            me.resetDrawingButton();
+                            me.setAreaResult("invalid", error.message)
+
                         }
-
-
-
-                        me.polygonValid = polygonValid;
-
-                        dijitRegistry.byId("submitButton").set('disabled', !me.polygonValid || !me.emailValid);
-                        me.resetDrawingButton();
-
-                    },
-                    function (error) {
-                        me.resetDrawingButton();
-                        me.setAreaResult("invalid", error.message)
-
-                    }
-                );
-
-                window.document.getElementById("paramRequestPolygon").value = myWKT;
-
+                    );
+                }
             }
-
         });
     }
 );
