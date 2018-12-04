@@ -125,7 +125,7 @@ define([
                         //window.document.getElementById("openDataForm").submit();
                         var request = esriRequest({
                             // Location of the data
-                            url: me.fmeServerBaseUrl + "fmedatadownload/KPB_OpenData/NAS_Abgabe.fmw",
+                            url: me.fmeServerBaseUrl + "fmedatadownload/KPB_OpenData/ALKIS-Datenabgabe.fmw",
                             // Service parameters if required, sent with URL as key/value pairs
                             content: {
                                 Auftragsnummer: "123456",
@@ -239,7 +239,7 @@ define([
                 // Die Mobil-Variante wird geschaltet, wenn entweder zu wenig 
                 // Platz auf dem Bildschirm ist oder ein Gerät mit Touch-Bedienung
                 // verwendet wird.
-                this.drawInMobileMode = (window.innerWidth < 1000) || window.userIsTouching;
+                this.drawInMobileMode = (window.innerWidth < 1000) || (window.innerHeight < 600) || window.userIsTouching;
 
 
                 this.setAreaResult("initial", this.POLYGON_DEFAULT);
@@ -328,7 +328,7 @@ define([
 
                     var request = esriRequest({
                         // Location of the data
-                        url: this.fmeServerBaseUrl + "fmedatastreaming/KPB_OpenData/KPB_Anfrage-Flaeche-pruefen.fmw",
+                        url: this.fmeServerBaseUrl + "fmedatastreaming/KPB_OpenData/Anfrage-Flaeche-pruefen.fmw",
                         // Service parameters if required, sent with URL as key/value pairs
                         content: {
                             paramRequestPolygon: myWKT,
