@@ -2,7 +2,7 @@
 
 REM Define general settings
 SET TEST_DIR=%~dp0
-SET ENDPOINT=https://fme.gkdpb.de
+SET ENDPOINT=https://fmetest.gkdpb.de
 SET BASE_DIR=%~dp0..\..\
 CALL %BASE_DIR%\config\environment.bat
 
