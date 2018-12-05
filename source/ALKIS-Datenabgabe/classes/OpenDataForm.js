@@ -40,7 +40,6 @@ define([
             fillSymbol: null,
             map: null,
             fmeServerBaseUrl: null,
-            fmeServerToken: null,
             draw: null,
             drawnArea: null,
             mapExtentChangeHandle: null,
@@ -66,7 +65,6 @@ define([
 
                 this.map = map;
                 this.fmeServerBaseUrl = options.fmeServerBaseUrl;
-                this.fmeServerToken = options.fmeServerToken;
                 this.makeSmallCallback = options.makeSmallCallback;
                 this.makeTallCallback = options.makeTallCallback;
 
@@ -130,7 +128,6 @@ define([
                             content: {
                                 Auftragsnummer: "123456",
                                 Mode: "server",
-                                token: me.fmeServerToken,
                                 opt_servicemode: "async",
                                 opt_showresult: false,
                                 paramRequestPolygon: me.wktPolygon,
@@ -332,8 +329,7 @@ define([
                         // Service parameters if required, sent with URL as key/value pairs
                         content: {
                             paramRequestPolygon: myWKT,
-                            mode: "server",
-                            token: this.fmeServerToken
+                            mode: "server"
                         },
                         // Data format
                         handleAs: "json"

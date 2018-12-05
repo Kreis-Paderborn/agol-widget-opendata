@@ -30,7 +30,6 @@ define([
 
 				this.form = new OpenDataForm(this.map, {
 					fmeServerBaseUrl: this.config.environment.fmeServerBaseUrl,
-					fmeServerToken: this.config.environment.fmeServerToken,
 					makeSmallCallback: this.makeSmall,
 					makeTallCallback: this.makeTall,
 				});

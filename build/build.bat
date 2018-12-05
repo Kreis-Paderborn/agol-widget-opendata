@@ -32,8 +32,7 @@ goto :continue1
 
     REM -------------------------
     REM Platzhalter in der kopierten Konfig-Datei ersetzen
-    call replace.bat "%CONFIG_TARGET_FILE%" ${FME_SERVER_TOKEN} %FME_SERVER_TOKEN%
-    call replace.bat "%CONFIG_TARGET_FILE%" ${FME_SERVER_BASE_URL} %FME_SERVER_BASE_URL%
+     call replace.bat "%CONFIG_TARGET_FILE%" ${FME_SERVER_BASE_URL} %FME_SERVER_BASE_URL%
 
     REM -------------------------
     REM Platzhalter in der proxy-Konfig-Datei ersetzen
