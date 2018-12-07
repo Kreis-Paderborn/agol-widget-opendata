@@ -57,8 +57,16 @@ define([
             POLYGON_INVALID: "Das eingezeichnete Anfragepolygon ist ungültig.",
             POLYGON_VALID: "Das eingezeichnete Anfragepolygon ist in Ordnung.",
             POLYGON_NO_INTERACTION: "Es wurde keine Geometrie gezeichnet. Setzen Sie durch Tippen in die Karte mindestens 3 Punkte um ein Polygon festzulegen.",
-            POLYGON_OUTSIDE_KPB: "Das Anfragepolygon muss innerhalb der Kreisgrenze liegen.",
+            POLYGON_OUTSIDE_KPB: "Das Anfragepolygon muss vollständig innerhalb der Kreisgrenze liegen.",
             POLYGON_TO_LARGE: "Die maximale Größe wurde nicht eingehalten.",
+            POLYGON_INTERNAL_ERROR: "Aktuell besteht ein internes Problem mit der Flächenprüfung. Bitte versuchen Sie es später noch einmal. Sollte das Problem weiterhin bestehen, informieren Sie uns bitte unter GIS@Kreis-Paderborn.de.",
+            POLYGON_TIMEOUT: "Der Server ist aktuell ausgelastet. Bitte versuchen Sie es in wenigen Augenblicken noch einmal.",
+
+            // Werte für die Namen von warteschlangen
+            QUEUE_DAYTIME_LONG: "lang",
+            QUEUE_DAYTIME_SHORT: "kurz",
+            NIGHTLY: "Nachts%20alle%20Jobs",
+
 
 
             constructor: function (map, options) {
@@ -126,12 +134,13 @@ define([
                             url: me.fmeServerBaseUrl + "fmedatadownload/KPB_OpenData/ALKIS-Datenabgabe.fmw",
                             // Service parameters if required, sent with URL as key/value pairs
                             content: {
-                                Auftragsnummer: "123456",
+                                AuftragsnummerParam: (new Date()).getTime(),
                                 Mode: "server",
                                 opt_servicemode: "async",
-                                opt_showresult: false,
+                                opt_showresult: true,
                                 paramRequestPolygon: me.wktPolygon,
-                                opt_requesteremail: dijitRegistry.byId("opt_requesteremail").get('value')
+                                opt_requesteremail: dijitRegistry.byId("opt_requesteremail").get('value'),
+                                tm_tag: me.QUEUE_DAYTIME_LONG
                             },
                             // Data format
                             handleAs: "text"
@@ -139,11 +148,19 @@ define([
 
                         request.then(
                             function (response) {
-                                alert("Fertig!");
+                                if (response.includes("Completed Successfully")) {
+                                    alert("Ihre Anfrage wurde erfolgreich entgegengenommen.\n\nNach Abschluss der Bearbeitung erhalten Sie eine eMail an die angegebene Adresse.");
+                                } else {
+                                    alert("Aktuell besteht ein internes Problem mit der OpenData-Bereitstellung.\n\nBitte versuchen Sie es später noch einmal.\nSollte das Problem weiterhin bestehen, informieren Sie uns bitte unter GIS@Kreis-Paderborn.de.");
+                                }
                                 submitButton.cancel();
                             },
                             function (error) {
-                                alert("Error: " + error.message);
+                                if (error.response.status != 200) {
+                                    alert("Aktuell besteht ein internes Problem mit der OpenData-Bereitstellung.\n\nBitte versuchen Sie es später noch einmal.\nSollte das Problem weiterhin bestehen, informieren Sie uns bitte unter GIS@Kreis-Paderborn.de.");
+                                }
+                                submitButton.cancel();
+
                             }
                         );
                     }
@@ -329,7 +346,9 @@ define([
                         // Service parameters if required, sent with URL as key/value pairs
                         content: {
                             paramRequestPolygon: myWKT,
-                            mode: "server"
+                            mode: "server",
+                            tm_ttl: 5, // Setzt die maximale Wartezeit auf 5 Sekunden
+                            tm_tag: me.QUEUE_DAYTIME_SHORT // Wähle die zu verwendende Warteschlange
                         },
                         // Data format
                         handleAs: "json"
@@ -376,7 +395,13 @@ define([
                         },
                         function (error) {
                             me.resetDrawingButton();
-                            me.setAreaResult("invalid", error.message)
+                            if (error.response.status === 502) {
+                                // Dies wird vermutlich sein, wenn die Verarbeitung wegen Zeitüberschreitung abgebrochen wurde
+                                me.setAreaResult("invalid", me.POLYGON_TIMEOUT)
+                            } else {
+                                // Dies könnte sein, wenn Status 404 ist, also der Worksapce nicht mehr unter dem Namen vorhanden ist.
+                                me.setAreaResult("invalid", me.POLYGON_INTERNAL_ERROR)
+                            }
 
                         }
                     );
