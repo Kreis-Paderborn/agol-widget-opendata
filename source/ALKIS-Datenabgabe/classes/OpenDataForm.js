@@ -63,8 +63,8 @@ define([
             POLYGON_TIMEOUT: "Der Server ist aktuell ausgelastet. Bitte versuchen Sie es in wenigen Augenblicken noch einmal.",
 
             // Werte für die Namen von warteschlangen
-            QUEUE_DAYTIME_LONG: "lang",
-            QUEUE_DAYTIME_SHORT: "kurz",
+            QUEUE_DAYTIME_LONG: "Tagsueber_Lange_Jobs",
+            QUEUE_DAYTIME_SHORT: "Tagsueber_Kurze_Jobs",
             NIGHTLY: "Nachts%20alle%20Jobs",
 
 
