@@ -13,7 +13,7 @@ SET MY_LOGDIR=%~dp0%SOAP_LOG_DIR_NAME%
 mkdir %MY_LOGDIR%
 
 REM RUN the SOAP-UI tests
-SET PROJECT_FILE="%~dp0Check-Anfrage-Flaeche-pruefen-soapui-project.xml"
+SET PROJECT_FILE="%~dp0KPB-Abhaengigkeiten-pruefen-soapui-project.xml"
 cd %MY_LOGDIR%
 call "C:\Programme portable\SoapUI-5.4.0-EB\bin\testrunner.bat" -r -j -f%MY_LOGDIR% %PROJECT_FILE% > %MY_LOGDIR%test_run.log
 cd %TEST_DIR%
