@@ -13,6 +13,8 @@ define([
     'esri/geometry/screenUtils',
     'dijit/form/ValidationTextBox',
     'dijit/form/CheckBox',
+    'dijit/Dialog',
+    'dijit/form/Button',
     'dojo/domReady!',
     'dojox/form/BusyButton',
     'dijit/registry',
@@ -32,6 +34,8 @@ define([
     screenUtils,
     dijitValidationTextBox,
     dijitCheckBox,
+    dijitDialog,
+    dijitFormButton,
     dijitReady,
     BusyButton,
     dijitRegistry,
@@ -159,21 +163,35 @@ define([
                             handleAs: "text"
                         });
 
+                        var okButton = "<br><button data-dojo-type=\"dijit/form/Button\" type=\"submit\">OK</button>";
+                        var successMsg = new dijitDialog({
+                            title: "Anfrage erfolgreich",
+                            style: "width: 300px;text-align:center",   
+                            content: "Ihre Anfrage wurde erfolgreich entgegengenommen.<br><br>Nach Abschluss der Bearbeitung erhalten Sie eine eMail an die angegebene Adresse.<br>" + okButton,
+                            closable: false
+                        });
+                        var failureMsg = new dijitDialog({
+                            title: "Anfrage fehlgeschlagen",
+                            style: "width: 300px;text-align:center",   
+                            content: "Aktuell besteht ein internes Problem mit der OpenData-Bereitstellung.\n\nBitte versuchen Sie es später noch einmal.\nSollte das Problem weiterhin bestehen, informieren Sie uns bitte unter GIS@Kreis-Paderborn.de..<br>" + okButton,
+                            closable: false
+                        });
+
                         request.then(
                             function (response) {
                                 if (response.includes("Completed Successfully")) {
-                                    alert("Ihre Anfrage wurde erfolgreich entgegengenommen.\n\nNach Abschluss der Bearbeitung erhalten Sie eine eMail an die angegebene Adresse.");
+                                    successMsg.show();
+                                    
                                 } else {
-                                    alert("Aktuell besteht ein internes Problem mit der OpenData-Bereitstellung.\n\nBitte versuchen Sie es später noch einmal.\nSollte das Problem weiterhin bestehen, informieren Sie uns bitte unter GIS@Kreis-Paderborn.de.");
+                                    failureMsg.show();
                                 }
                                 submitButton.cancel();
                             },
                             function (error) {
                                 if (error.response.status != 200) {
-                                    alert("Aktuell besteht ein internes Problem mit der OpenData-Bereitstellung.\n\nBitte versuchen Sie es später noch einmal.\nSollte das Problem weiterhin bestehen, informieren Sie uns bitte unter GIS@Kreis-Paderborn.de.");
+                                    failureMsg.show();
                                 }
                                 submitButton.cancel();
-
                             }
                         );
                     }
