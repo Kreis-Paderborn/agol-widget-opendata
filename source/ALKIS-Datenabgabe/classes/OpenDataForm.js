@@ -12,6 +12,7 @@ define([
     'esri/request',
     'esri/geometry/screenUtils',
     'dijit/form/ValidationTextBox',
+    'dijit/form/CheckBox',
     'dojo/domReady!',
     'dojox/form/BusyButton',
     'dijit/registry',
@@ -30,6 +31,7 @@ define([
     esriRequest,
     screenUtils,
     dijitValidationTextBox,
+    dijitCheckBox,
     dijitReady,
     BusyButton,
     dijitRegistry,
@@ -51,6 +53,7 @@ define([
             // Status für Formular
             polygonValid: false,
             emailValid: false,
+            complianceValid: false,
 
             // Texte für Prüfergebnis der Flächenprüfung
             POLYGON_DEFAULT: "Keine Fläche vorhanden.",
@@ -91,7 +94,7 @@ define([
                     onKeyUp: function () {
                         me.emailValid = this.isValid();
 
-                        dijitRegistry.byId("submitButton").set('disabled', !me.polygonValid || !me.emailValid);
+                        dijitRegistry.byId("submitButton").set('disabled', !me.polygonValid || !me.emailValid || !me.complianceValid);
                     },
                     value: "", //value: "TrantowA@Kreis-Paderborn.de",
                     name: "opt_requesteremail"
@@ -115,6 +118,16 @@ define([
                     }
                 }, "drawButton");
                 drawButton.startup();
+
+                var complianceCheckBox = new dijitCheckBox({
+                    name: "complianceCheckBox",
+                    value: "agreed",
+                    checked: false,
+                    onChange: function (checked) {
+                        me.complianceValid = checked;
+                        dijitRegistry.byId("submitButton").set('disabled', !me.polygonValid || !me.emailValid || !me.complianceValid);
+                    }
+                }, "complianceCheckBox").startup();
 
                 var submitButton = new BusyButton({
                     label: "Anfrage absenden",
@@ -389,7 +402,7 @@ define([
 
                             me.polygonValid = polygonValid;
 
-                            dijitRegistry.byId("submitButton").set('disabled', !me.polygonValid || !me.emailValid);
+                            dijitRegistry.byId("submitButton").set('disabled', !me.polygonValid || !me.emailValid || !me.complianceValid);
                             me.resetDrawingButton();
 
                         },
