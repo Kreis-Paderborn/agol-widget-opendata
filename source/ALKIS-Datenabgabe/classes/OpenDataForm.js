@@ -91,6 +91,7 @@ define([
                 var emailTextbox = new dijitValidationTextBox({
                     style: "width:100%",
                     required: true,
+                    autocomplete: "on",
                     promptMessage: "Bitte eMail eingeben.",
                     missingMessage: "Es muss eine eMail angegeben werden.",
                     invalidMessage: "Der eingegeben Wert ist keine gültige eMail-Adresse",
@@ -163,16 +164,16 @@ define([
                             handleAs: "text"
                         });
 
-                        var okButton = "<br><button data-dojo-type=\"dijit/form/Button\" type=\"submit\">OK</button>";
+                        var okButton = "<br><button data-dojo-type=\"dijit/form/Button\" type=\"button\" data-dojo-props=\"onClick:function(){window.kpbClearWidget();}\">OK</button>";
                         var successMsg = new dijitDialog({
                             title: "Anfrage erfolgreich",
-                            style: "width: 300px;text-align:center",   
-                            content: "Ihre Anfrage wurde erfolgreich entgegengenommen.<br><br>Nach Abschluss der Bearbeitung erhalten Sie eine eMail an die angegebene Adresse.<br>" + okButton,
+                            style: "width: 250px;text-align:center",   
+                            content: "Ihre Anfrage wurde erfolgreich entgegengenommen.<br><br>Nach Abschluss der Bearbeitung erhalten Sie eine Nachricht an die angegebene<br>eMail-Adresse.<br>" + okButton,
                             closable: false
                         });
                         var failureMsg = new dijitDialog({
                             title: "Anfrage fehlgeschlagen",
-                            style: "width: 300px;text-align:center",   
+                            style: "width: 250px;text-align:center",   
                             content: "Aktuell besteht ein internes Problem mit der OpenData-Bereitstellung.\n\nBitte versuchen Sie es später noch einmal.\nSollte das Problem weiterhin bestehen, informieren Sie uns bitte unter GIS@Kreis-Paderborn.de..<br>" + okButton,
                             closable: false
                         });
@@ -181,7 +182,24 @@ define([
                             function (response) {
                                 if (response.includes("Completed Successfully")) {
                                     successMsg.show();
-                                    
+
+                                    // Das Anfragepolygon löschen
+                                    window.kpbClearWidget = function() {
+                                        
+                                        successMsg.hide();
+                                        me.setAreaResult("initial", me.POLYGON_DEFAULT);
+                                        me.map.graphics.clear();
+                                        me.polygonValid = false;
+
+                                        // dijitRegistry.byId("opt_requesteremail").reset();
+                                        // me.emailValid = false;
+
+                                        // dijitRegistry.byId("complianceCheckBox").set("checked", false);
+                                        // me.complianceValid = false;
+
+                                        dijitRegistry.byId("submitButton").set('disabled', !me.polygonValid || !me.emailValid || !me.complianceValid);
+
+                                    }
                                 } else {
                                     failureMsg.show();
                                 }
@@ -429,9 +447,11 @@ define([
                             if (error.response.status === 502) {
                                 // Dies wird vermutlich sein, wenn die Verarbeitung wegen Zeitüberschreitung abgebrochen wurde
                                 me.setAreaResult("invalid", me.POLYGON_TIMEOUT)
+                                me.polygonValid = false;
                             } else {
                                 // Dies könnte sein, wenn Status 404 ist, also der Worksapce nicht mehr unter dem Namen vorhanden ist.
                                 me.setAreaResult("invalid", me.POLYGON_INTERNAL_ERROR)
+                                me.polygonValid = false;
                             }
 
                         }
