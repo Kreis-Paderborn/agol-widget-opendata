@@ -38,3 +38,4 @@ if %size% LSS 1 (
         echo dummy > %error_file%
     )
     xcopy "%SOAP_LOG_DIR_NAME%results.html" %error_file% /y /i
+)
