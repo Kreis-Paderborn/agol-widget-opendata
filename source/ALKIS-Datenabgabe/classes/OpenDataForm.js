@@ -156,36 +156,42 @@ define([
                                 Mode: "server",
                                 opt_servicemode: "async",
                                 opt_showresult: true,
+                                opt_responseformat: "json",
                                 paramRequestPolygon: me.wktPolygon,
                                 opt_requesteremail: dijitRegistry.byId("opt_requesteremail").get('value'),
-                                tm_tag: me.QUEUE_DAYTIME_LONG
+                                tm_tag: me.QUEUE_DAYTIME_LONG,
+                                param_purpose: "TEST",
+                                param_gui: me.drawInMobileMode ? "TOUCH" : "DESKTOP"
                             },
                             // Data format
-                            handleAs: "text"
+                            handleAs: "json"
                         });
 
                         var okButton = "<br><button data-dojo-type=\"dijit/form/Button\" type=\"button\" data-dojo-props=\"onClick:function(){window.kpbClearWidget();}\">OK</button>";
                         var successMsg = new dijitDialog({
                             title: "Anfrage erfolgreich",
-                            style: "width: 250px;text-align:center",   
+                            style: "width: 250px;text-align:center",
                             content: "Ihre Anfrage wurde erfolgreich entgegengenommen.<br><br>Nach Abschluss der Bearbeitung erhalten Sie eine Nachricht an die angegebene<br>eMail-Adresse.<br>" + okButton,
                             closable: false
                         });
                         var failureMsg = new dijitDialog({
                             title: "Anfrage fehlgeschlagen",
-                            style: "width: 250px;text-align:center",   
+                            style: "width: 250px;text-align:center",
                             content: "Aktuell besteht ein internes Problem mit der OpenData-Bereitstellung.\n\nBitte versuchen Sie es später noch einmal.\nSollte das Problem weiterhin bestehen, informieren Sie uns bitte unter GIS@Kreis-Paderborn.de..<br>" + okButton,
                             closable: false
                         });
 
                         request.then(
                             function (response) {
-                                if (response.includes("Completed Successfully")) {
+                                if (response.serviceResponse &&
+                                    response.serviceResponse.statusInfo &&
+                                    response.serviceResponse.statusInfo.status === "success") {
+
                                     successMsg.show();
 
                                     // Das Anfragepolygon löschen
                                     window.kpbClearWidget = function() {
-                                        
+
                                         successMsg.hide();
                                         me.setAreaResult("initial", me.POLYGON_DEFAULT);
                                         me.map.graphics.clear();
