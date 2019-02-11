@@ -1,0 +1,16 @@
+Für die fehlerfreie Arbeit mit der GDB an den unterschiedlichen Stellen
+	□ Neue GDB lokal anlegen
+	□ Lokal mit ALKIS-Datenabgabe.FMW dort die gewünschte Struktur einspielen
+	□ Sicherstellen, dass die FMW auch auf den Server hochgeladen ist
+	□ In DownloadOpenDataStatistics.fmw den Reader mit dieser neuen Struktur updaten
+	□ Dann wieder die Server-Pfade in dieser FMW setzen und hochladen
+	□ Dann noch die DB in den Resourcen mit der lokalen ersetzen
+	□ Schließlich muss in OpenDataStatsToSDE.FMW noch der FeatureReader mit der neuen Struktur aktualisiert werden
+	
+Für das Einspielen in die SDE	
+	□ Darauf achten, dass in der GDB das Koordinatensystem auf 25832 gesetzt ist
+	□ Per "Rechtsklick > Exportieren > XML-Worspace Dokument..." ausspielen.
+	□ In dem XML die min-max-Werte durch die Angaben aus "min_max_replace.xml" ersetzen
+	□ In der SDE-Datenbankverbindung per "Imortieren > Rechtsklick > XML-Worspace Dokument..." die Tabelle anlegen
+	
+	
