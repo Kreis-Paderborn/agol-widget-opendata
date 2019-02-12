@@ -20,7 +20,8 @@
   background-color: #d07d0e;
 }
 
+
+/* AT: Änderung, um das Download-Symbol kräftig anzuzeigen*/
 .jimu-widget-header-controller .icon-node{
   opacity: 1;
-
 }
