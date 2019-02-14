@@ -84,7 +84,7 @@ define([
                 this.makeTallCallback = options.makeTallCallback;
 
                 // specify class defaults
-                this.fillSymbol = options.fillSymbol || new SimpleFillSymbol("solid", new SimpleLineSymbol("solid", new Color([232, 104, 80]), 2), new Color([232, 104, 80, 0.25]));
+                this.fillSymbol = options.fillSymbol || new SimpleFillSymbol("solid", new SimpleLineSymbol("solid", new Color([0, 155, 216]), 2), new Color([0, 155, 216, 0.25]));
                 this.setAreaResult("initial", this.POLYGON_DEFAULT);
 
                 var me = this;
@@ -248,7 +248,7 @@ define([
                 });
 
                 // Hier kann der Stil während des Zeichnens definiert werden
-                // this.draw.fillSymbol = this.fillSymbol;
+                this.draw.fillSymbol = new SimpleFillSymbol("solid", new SimpleLineSymbol("solid", new Color([0, 155, 216]), 2), new Color([0, 0, 0, 0.25]));
 
                 // addGraphic is called by an external function, esriRequest
                 // hitch() is used to provide the proper context so that addGraphic
