@@ -98,8 +98,6 @@ define([
                     regExp: "\\w+([\\.-]?\\w+)*@\\w+([\\.-]?\\w+)*(\\.\\w{2,3})+",
                     onKeyUp: function () {
                         me.emailValid = this.isValid();
-
-                        dijitRegistry.byId("submitButton").set('disabled', !me.polygonValid || !me.emailValid || !me.complianceValid);
                     },
                     value: "", //value: "TrantowA@Kreis-Paderborn.de",
                     name: "opt_requesteremail"
@@ -110,7 +108,7 @@ define([
 
                 var drawButton = new BusyButton({
                     label: "Bereich festlegen",
-                    busyLabel: "Bereich festlegen...",
+                    busyLabel: "Bitte Zeichnen Sie die Fläche in der Karte ein...",
                     disabled: false,
                     onClick: function () {
 
@@ -130,16 +128,38 @@ define([
                     checked: false,
                     onChange: function (checked) {
                         me.complianceValid = checked;
-                        dijitRegistry.byId("submitButton").set('disabled', !me.polygonValid || !me.emailValid || !me.complianceValid);
                     }
                 }, "complianceCheckBox").startup();
 
                 var submitButton = new BusyButton({
                     label: "Anfrage absenden",
                     busyLabel: "Anfrage absenden...",
-                    //baseClass:"jimu-btn",
-                    disabled: true,
+                    disabled: false,
                     onClick: function () {
+                        var okButtonOnlyHide = "<br><button data-dojo-type=\"dijit/form/Button\" type=\"submit\">OK</button>";                        
+
+                        if (!me.polygonValid || !me.emailValid || !me.complianceValid) {
+                            var incompleteMsg = "Die Anfrage kann noch<br/>nicht abgesendet werden.<br/><br/>";
+
+                            if (!me.polygonValid) {
+                                incompleteMsg += "Bitte legen Sie zunächst einen<br/>gültigen Bereich für die Anfrage fest.";
+                            } else if (!me.complianceValid) {
+                                incompleteMsg += "Bitte akzeptieren Sie<br/>die Datenschutzbestimmungen.";
+                            } else if (!me.emailValid) {
+                                incompleteMsg += "Bitte geben Sie eine<br/>gültige eMail-Adresse an.";
+                            }
+
+                            var incompleteDialog = new dijitDialog({
+                                title: "Formular unvollständig",
+                                style: "width: 250px;text-align:center",
+                                content: incompleteMsg + "<br/>" + okButtonOnlyHide,
+                                closable: false
+                            });
+                            incompleteDialog.show();
+
+                            submitButton.cancel();
+                            return;
+                        }
 
                         // Wir müssem den Button explizit auf "busy" setzen,
                         // da diese nach dem ersten "Cancel" nicht mehr automatisch
@@ -167,17 +187,17 @@ define([
                             handleAs: "json"
                         });
 
-                        var okButton = "<br><button data-dojo-type=\"dijit/form/Button\" type=\"button\" data-dojo-props=\"onClick:function(){window.kpbClearWidget();}\">OK</button>";
+                        var okButtonWithFunction = "<br><button data-dojo-type=\"dijit/form/Button\" type=\"button\" data-dojo-props=\"onClick:function(){window.kpbClearWidget();}\">OK</button>";
                         var successMsg = new dijitDialog({
                             title: "Anfrage erfolgreich",
                             style: "width: 250px;text-align:center",
-                            content: "Ihre Anfrage wurde erfolgreich entgegengenommen.<br><br>Nach Abschluss der Bearbeitung erhalten Sie eine Nachricht an die angegebene<br>eMail-Adresse.<br>" + okButton,
+                            content: "Ihre Anfrage wurde erfolgreich entgegengenommen.<br><br>Nach Abschluss der Bearbeitung erhalten Sie eine Nachricht an die angegebene<br>eMail-Adresse.<br>" + okButtonWithFunction,
                             closable: false
                         });
                         var failureMsg = new dijitDialog({
                             title: "Anfrage fehlgeschlagen",
                             style: "width: 250px;text-align:center",
-                            content: "Aktuell besteht ein internes Problem mit der OpenData-Bereitstellung.\n\nBitte versuchen Sie es später noch einmal.\nSollte das Problem weiterhin bestehen, informieren Sie uns bitte unter GIS@Kreis-Paderborn.de..<br>" + okButton,
+                            content: "Aktuell besteht ein internes Problem mit der OpenData-Bereitstellung.\n\nBitte versuchen Sie es später noch einmal.\nSollte das Problem weiterhin bestehen, informieren Sie uns bitte unter GIS@Kreis-Paderborn.de..<br>" + okButtonOnlyHide,
                             closable: false
                         });
 
@@ -191,20 +211,10 @@ define([
 
                                     // Das Anfragepolygon löschen
                                     window.kpbClearWidget = function() {
-
                                         successMsg.hide();
                                         me.setAreaResult("initial", me.POLYGON_DEFAULT);
                                         me.map.graphics.clear();
                                         me.polygonValid = false;
-
-                                        // dijitRegistry.byId("opt_requesteremail").reset();
-                                        // me.emailValid = false;
-
-                                        // dijitRegistry.byId("complianceCheckBox").set("checked", false);
-                                        // me.complianceValid = false;
-
-                                        dijitRegistry.byId("submitButton").set('disabled', !me.polygonValid || !me.emailValid || !me.complianceValid);
-
                                     }
                                 } else {
                                     failureMsg.show();
@@ -270,10 +280,6 @@ define([
 
             stopDrawing: function (killWidget) {
 
-                //Ist die Frage, ob man während dem Zeichnen
-                //die Karte bewegen könnne soll oder nicht.
-                // this.map.enableMapNavigation();
-
                 if (this.drawInMobileMode) {
 
                     // Wenn das Festlegen der Fläche gestoppt wird, weil das ganze
@@ -309,14 +315,8 @@ define([
                 // Platz auf dem Bildschirm ist oder ein Gerät mit Touch-Bedienung
                 // verwendet wird.
                 this.drawInMobileMode = (window.innerWidth < 1000) || (window.innerHeight < 600) || window.userIsTouching;
-
-
+                
                 this.setAreaResult("initial", this.POLYGON_DEFAULT);
-
-                //Ist die Frage, ob man während dem Zeichnen
-                //die Karte bewegen könnne soll oder nicht.
-                //this.map.disableMapNavigation();
-
                 this.map.graphics.clear();
                 this.wktPolygon = undefined;
                 var me = this;
@@ -440,11 +440,7 @@ define([
                                 polygonValid = false;
                             }
 
-
-
                             me.polygonValid = polygonValid;
-
-                            dijitRegistry.byId("submitButton").set('disabled', !me.polygonValid || !me.emailValid || !me.complianceValid);
                             me.resetDrawingButton();
 
                         },
