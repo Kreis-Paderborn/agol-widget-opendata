@@ -1,0 +1,27 @@
+.jimu-widget-homebutton {
+  background-color: #ccc;
+  
+    /* AT-KPB: Blauer HomeButton */ 
+	background-color: rgba(0,78,151,0.2);
+	border-radius: 5px;
+}
+
+.jimu-widget-homebutton .HomeButton .home {
+	
+	/* AT-KPB: Blauer HomeButton */ 
+  background-color: rgba(0,78,151,1);
+}
+
+.jimu-widget-homebutton.inHome {
+	background-color: #000;
+}
+
+.jimu-widget-homebutton .HomeButton .home:hover {
+	
+	/* AT-KPB: Blauer HomeButton */ 
+  background-color: rgba(0,78,151,0.2);
+}
+
+.jimu-widget-homebutton.inHome .HomeButton .home {
+	background-color: #000;
+}
