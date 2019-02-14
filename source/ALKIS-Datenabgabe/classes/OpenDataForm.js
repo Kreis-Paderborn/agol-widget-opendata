@@ -65,7 +65,7 @@ define([
             POLYGON_VALID: "Das eingezeichnete Anfragepolygon ist in Ordnung.",
             POLYGON_NO_INTERACTION: "Es wurde keine Geometrie gezeichnet. Setzen Sie durch Tippen in die Karte mindestens 3 Punkte um ein Polygon festzulegen.",
             POLYGON_OUTSIDE_KPB: "Das Anfragepolygon muss vollständig innerhalb der Kreisgrenze liegen.",
-            POLYGON_TO_LARGE: "Die maximale Größe wurde nicht eingehalten.",
+            POLYGON_TO_LARGE: "Die maximale Größe wurde nicht eingehalten. Das von Ihnen gezeichnete Polygon hat einen Flächeninhalt von ",
             POLYGON_INTERNAL_ERROR: "Aktuell besteht ein internes Problem mit der Flächenprüfung. Bitte versuchen Sie es später noch einmal. Sollte das Problem weiterhin bestehen, informieren Sie uns bitte unter GIS@Kreis-Paderborn.de.",
             POLYGON_TIMEOUT: "Der Server ist aktuell ausgelastet. Bitte versuchen Sie es in wenigen Augenblicken noch einmal.",
 
@@ -423,7 +423,7 @@ define([
                             }
 
                             if (response[0].requestPolygonToLarge == 1) {
-                                me.setAreaResult("invalid", me.POLYGON_TO_LARGE)
+                                me.setAreaResult("invalid", me.POLYGON_TO_LARGE + response[0].details + " km².")
                                 polygonValid = false;
                             } else if (response[0].requestPolygonToLarge == 0) {
 
