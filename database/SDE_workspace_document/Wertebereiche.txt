@@ -6,17 +6,23 @@ SUCCESS
 FAILURE
 ABORTED
 IBRDONE
+In Bearbeitung
+Erfolgreich bereitgestellt
+Fehlerhaft abgebrochen
+Gestoppt durch Admin
+ibR-Abruf erfolgreich
+
 
 gui:
 ----
-DESKTOP
-TOUCH
+Desktop
+Touch
 
 format:
 -------
-NAS
-SHAPE
-DXF
+NAS (ALKIS-Schnittstelle)
+Shape (AdV-Profil 1.0.1)
+DXF (Release 2013)
 
 purose:
 -------
