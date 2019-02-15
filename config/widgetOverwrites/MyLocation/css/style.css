@@ -45,7 +45,8 @@
 }
 
 .jimu-widget-mylocation .place-holder{
-  background-color: rgba(0,0,0,0);
+  /* AT-KPB: Blauer Button "MyLocation"  */ 
+  background-color: rgba(0,78,151,1);
 }
 
 .jimu-widget-mylocation.onLocate .place-holder{
@@ -59,5 +60,5 @@
 
 .jimu-widget-mylocation .place-holder:hover{
   /* AT-KPB: Blauer Button "MyLocation"  */ 
-  background-color: rgba(0,78,151,1);
+  background-color: rgba(0,78,151,0.2);
 }
