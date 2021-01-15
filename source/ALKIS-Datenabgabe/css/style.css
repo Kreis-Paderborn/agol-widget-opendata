@@ -43,3 +43,14 @@
   width: 100%;
 }
 
+.claro .kpbFailure .dijitDialogTitleBar {
+  background-color: #e94646 !important;
+}
+
+.claro .kpbIncomplete .dijitDialogTitleBar {
+  background-color: #f0ae57 !important;
+}
+
+.claro .kpbSuccess .dijitDialogTitleBar {
+  background-color: #32bb39 !important;
+}

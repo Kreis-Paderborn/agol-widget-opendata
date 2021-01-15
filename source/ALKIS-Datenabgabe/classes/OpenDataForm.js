@@ -152,9 +152,10 @@ define([
 
                             var incompleteDialog = new dijitDialog({
                                 title: "Formular unvollständig",
-                                style: "width: 250px;text-align:center",
+                                style: "width: 250px;text-align:center;",
                                 content: incompleteMsg + "<br/>" + okButtonOnlyHide,
-                                closable: false
+                                closable: false,
+                                class: "kpbIncomplete"
                             });
                             incompleteDialog.show();
 
@@ -193,13 +194,15 @@ define([
                             title: "Anfrage erfolgreich",
                             style: "width: 250px;text-align:center",
                             content: "Ihre Anfrage wurde erfolgreich entgegengenommen.<br><br>Nach Abschluss der Bearbeitung erhalten Sie eine Nachricht an die angegebene<br>eMail-Adresse.<br>" + okButtonWithFunction,
-                            closable: false
+                            closable: false,
+                            class: "kpbSuccess"
                         });
                         var failureMsg = new dijitDialog({
                             title: "Anfrage fehlgeschlagen",
                             style: "width: 250px;text-align:center",
                             content: "Aktuell besteht ein internes Problem mit der OpenData-Bereitstellung.\n\nBitte versuchen Sie es später noch einmal.\nSollte das Problem weiterhin bestehen, informieren Sie uns bitte unter GIS@Kreis-Paderborn.de..<br>" + okButtonOnlyHide,
-                            closable: false
+                            closable: false,
+                            class: "kpbFailure"
                         });
 
                         request.then(
