@@ -11,6 +11,9 @@ Für das Einspielen in die SDE
 	□ Darauf achten, dass in der GDB das Koordinatensystem auf 25832 gesetzt ist
 	□ Per "Rechtsklick > Exportieren > XML-Worspace Dokument..." ausspielen.
 	□ In dem XML die min-max-Werte durch die Angaben aus "min_max_replace.xml" ersetzen
+	□ Titel der Datenbank auf "OPENDATA_ALKIS" ändern
+	□ AliasNames des Felder vergeben mit dem zusätzlichen Tag: <AliasName></AliasName>
 	□ In der SDE-Datenbankverbindung per "Imortieren > Rechtsklick > XML-Worspace Dokument..." die Tabelle anlegen
+	
 	
 	
