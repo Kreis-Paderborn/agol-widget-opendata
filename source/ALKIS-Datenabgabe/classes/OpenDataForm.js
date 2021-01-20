@@ -43,6 +43,7 @@ define([
 
     return declare(null, {
 
+        purpose: "TEST",
         fillSymbol: null,
         map: null,
         fmeServerBaseUrl: null,
@@ -62,7 +63,7 @@ define([
         polygonValid: false,
         emailValid: true,
         complianceValid: true,
-        
+
         // Texte für Prüfergebnis der Flächenprüfung
         POLYGON_DEFAULT: "Keine Fläche vorhanden.",
         POLYGON_INVALID: "Das eingezeichnete Anfragepolygon ist ungültig.",
@@ -71,7 +72,7 @@ define([
         POLYGON_OUTSIDE_KPB: "Das Anfragepolygon muss vollständig innerhalb der Kreisgrenze liegen.",
         POLYGON_TO_LARGE_1: "Die maximale Größe wurde nicht eingehalten. Das von Ihnen gezeichnete Polygon hat einen Flächeninhalt von ",
         POLYGON_TO_LARGE_2: " km².",
-        POLYGON_INTERNAL_ERROR: "Aktuell besteht ein internes Problem mit der Flächenprüfung. Bitte versuchen Sie es später noch einmal. Sollte das Problem weiterhin bestehen, informieren Sie uns bitte unter GIS@Kreis-Paderborn.de.",
+        POLYGON_INTERNAL_ERROR: "Aktuell besteht ein Problem mit der Flächenprüfung. Bitte versuchen Sie es später noch einmal. Sollte das Problem weiterhin bestehen, informieren Sie uns bitte unter GIS@Kreis-Paderborn.de.",
         POLYGON_TIMEOUT: "Der Server ist aktuell ausgelastet. Bitte versuchen Sie es in wenigen Augenblicken noch einmal.",
 
         // Werte für die Namen von warteschlangen
@@ -157,7 +158,7 @@ define([
                         paramRequestPolygon: me.wktPolygon,
                         opt_requesteremail: dijitRegistry.byId("opt_requesteremail").get('value'),
                         tm_tag: me.QUEUE_DAYTIME_LONG,
-                        param_purpose: "TEST",
+                        param_purpose: me.purpose,
                         param_gui: me.drawInMobileMode ? "Touch" : "Desktop"
                     },
                     // Data format
@@ -168,7 +169,7 @@ define([
                 var successMsg = new dijitDialog({
                     title: "Anfrage erfolgreich",
                     style: "width: 250px;text-align:center",
-                    content: "Ihre Anfrage wurde erfolgreich entgegengenommen.<br><br>Nach Abschluss der Bearbeitung erhalten Sie eine Nachricht an die angegebene<br>eMail-Adresse.<br>" + okButtonWithFunction,
+                    content: "Ihre Anfrage wurde erfolgreich entgegengenommen.<br><br>Nach Abschluss der Bearbeitung erhalten Sie eine Nachricht an Ihre angegebene<br>eMail-Adresse.<br>" + okButtonWithFunction,
                     closable: false,
                     class: "kpbSuccess"
                 });
@@ -176,7 +177,7 @@ define([
                 var failureMsg = new dijitDialog({
                     title: "Anfrage fehlgeschlagen",
                     style: "width: 250px;text-align:center",
-                    content: "Aktuell besteht ein internes Problem mit der OpenData-Bereitstellung.\n\nBitte versuchen Sie es später noch einmal.\nSollte das Problem weiterhin bestehen, informieren Sie uns bitte unter GIS@Kreis-Paderborn.de..<br>" + okButtonOnlyHide,
+                    content: "Aktuell besteht ein Problem mit der OpenData-Bereitstellung.\n\nBitte versuchen Sie es später noch einmal.\nSollte das Problem weiterhin bestehen, informieren Sie uns bitte unter GIS@Kreis-Paderborn.de..<br>" + okButtonOnlyHide,
                     closable: false,
                     class: "kpbFailure"
                 });
@@ -269,7 +270,7 @@ define([
                         var okButtonEMailValidation = "<br><tr data-dojo-attach-point=\"titleTr\"><td colspan=\"2\">" +
                             "<input class=\"eMailValidationCode\" id=\"" + validationInputId + "\"></td></tr><br><br>" +
                             "<button data-dojo-type=\"dijit/form/Button\" type=\"button\" data-dojo-props=\"onClick:function(){window.kpbValidationCodeOk();}\">OK</button>" +
-                            "<button data-dojo-type=\"dijit/form/Button\" type=\"button\" >Erneut senden</button>";
+                            "<button data-dojo-type=\"dijit/form/Button\" type=\"button\" data-dojo-props=\"onClick:function(){window.kpbValidationCodeResend();}\">Erneut senden</button>";
 
                         me.eMailValidationDialog = new dijitDialog({
                             title: "Bestätigung Ihrer eMail-Adresse",
@@ -279,10 +280,7 @@ define([
                             class: "kpbIncomplete"
                         });
 
-
-                        me.eMailValidationDialog.show();
-                        window.document.getElementById(validationInputId).value = eMailValidationCode;
-
+                        me.sendValidationCode(btoa(btoa(eMailValidationCode)), eMailFromInput);
 
                         // Das Anfragepolygon löschen
                         window.kpbValidationCodeOk = function () {
@@ -294,10 +292,25 @@ define([
                                 me.validEMails[eMailFromInput.toLowerCase()] = true;
                                 submitFunction();
                             } else {
-                                alert("Zahlencode ist nicht korrekt.");
+
+                                // Der Text im Textfeld wird rot eingefärbt.
                                 input.style = "color: #ff0808;"
                             }
                         };
+
+                        window.kpbValidationCodeResend = function () {
+
+                            // Das Textfeld wird auf den Ausgangszustand zurück gesetzt.
+                            var input = window.document.getElementById(validationInputId)
+                            input.style = "color: #000000;"
+                            input.value = "";
+
+                            // der Dialog wird geschlossen, da das Absenden des codes ihn wieder öffnet
+                            // (oder eine Fehlermeldung, falls das Absenden fehl schlägt.)
+                            me.eMailValidationDialog.hide();
+                            me.sendValidationCode(btoa(btoa(eMailValidationCode)), eMailFromInput);
+                        };
+                        
                     }
                 }
             }, "submitButton");
@@ -329,6 +342,58 @@ define([
             // if we do not bind this to "addGraphic" it will not run in scope of "this"
             //this.addGraphic = this.addGraphic.bind(this)
             this.draw.on("draw-complete", this.addGraphic);
+
+        },
+
+        /**
+         * Backend-Aufruf, um den generierten Code per eMail zu verschicken.
+         * 
+         * @param {String} code validierungscode, der per eMail verschickt werden soll.
+         * @param {String} email eMail-Adresse an die der Code geschickt wird.
+         */
+        sendValidationCode: function (code, email) {
+            var me = this;
+
+            var request = esriRequest({
+                // Location of the data
+                url: this.fmeServerBaseUrl + "fmedatastreaming/KPB_OpenData/ALKIS-eMail-Validierung.fmw",
+                // Service parameters if required, sent with URL as key/value pairs
+                content: {
+                    param_validationcode: btoa(btoa(btoa(code))),
+                    param_eMail: email,
+                    param_purpose: me.purpose,
+                    tm_ttl: 5, // Setzt die maximale Wartezeit auf 5 Sekunden
+                    tm_tag: me.QUEUE_DAYTIME_SHORT // Wähle die zu verwendende Warteschlange
+                },
+                // Data format
+                handleAs: "json"
+            });
+
+            request.then(
+                function (response) {
+
+                    if (response[0].internalError === "true") {
+
+                        var okButtonOnlyHide = "<br><button data-dojo-type=\"dijit/form/Button\" type=\"submit\">OK</button>";
+                        var failureMsg = new dijitDialog({
+                            title: "Anfrage fehlgeschlagen",
+                            style: "width: 250px;text-align:center",
+                            content: "Aktuell besteht ein Problem mit der OpenData-Bereitstellung.<br><br>Bitte versuchen Sie es später noch einmal. Sollte das Problem weiterhin bestehen, informieren Sie uns bitte unter <br>GIS@Kreis-Paderborn.de<br>" + okButtonOnlyHide,
+                            closable: false,
+                            class: "kpbFailure"
+                        });
+                        failureMsg.show();
+
+                    } else {
+                        me.eMailValidationDialog.show();
+                    }
+                },
+                function (error) {
+
+                    alert("Problem beim Versenden des Codes. Status-Code:  " + error.response.status);
+
+                }
+            );
 
         },
 
