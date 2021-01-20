@@ -54,3 +54,12 @@
 .claro .kpbSuccess .dijitDialogTitleBar {
   background-color: #32bb39 !important;
 }
+
+.eMailValidationCode {
+  text-align: center;
+  font-size: large;
+  margin-right: 33%;
+  margin-left: 33%;
+  width: 33%;
+  font-family: 'Courier New', Courier, monospace;
+}
