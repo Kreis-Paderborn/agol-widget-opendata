@@ -98,9 +98,9 @@ define([
                 style: "width:100%",
                 required: true,
                 autocomplete: "on",
-                promptMessage: "Bitte eMail eingeben.",
-                missingMessage: "Es muss eine eMail angegeben werden.",
-                invalidMessage: "Der eingegeben Wert ist keine gültige eMail-Adresse",
+                promptMessage: "Bitte E-Mail eingeben.",
+                missingMessage: "Es muss eine E-Mail angegeben werden.",
+                invalidMessage: "Der eingegeben Wert ist keine gültige E-Mail-Adresse",
                 regExp: "\\w+([\\.-]?\\w+)*@\\w+([\\.-]?\\w+)*(\\.\\w{2,3})+",
                 onKeyUp: function () {
                     me.emailValid = this.isValid();
@@ -169,7 +169,7 @@ define([
                 var successMsg = new dijitDialog({
                     title: "Anfrage erfolgreich",
                     style: "width: 250px;text-align:center",
-                    content: "Ihre Anfrage wurde erfolgreich entgegengenommen.<br><br>Nach Abschluss der Bearbeitung erhalten Sie eine Nachricht an Ihre angegebene<br>eMail-Adresse.<br>" + okButtonWithFunction,
+                    content: "Ihre Anfrage wurde erfolgreich entgegengenommen.<br><br>Nach Abschluss der Bearbeitung erhalten Sie eine Nachricht an Ihre angegebene<br>E-Mail-Adresse.<br>" + okButtonWithFunction,
                     closable: false,
                     class: "kpbSuccess"
                 });
@@ -232,7 +232,7 @@ define([
                         } else if (!me.complianceValid) {
                             incompleteMsg += "Bitte akzeptieren Sie<br/>die Datenschutzbestimmungen.";
                         } else if (!me.emailValid) {
-                            incompleteMsg += "Bitte geben Sie eine<br/>gültige eMail-Adresse an.";
+                            incompleteMsg += "Bitte geben Sie eine<br/>gültige E-Mail-Adresse an.";
                         }
 
                         var incompleteDialog = new dijitDialog({
@@ -266,14 +266,14 @@ define([
                         submitFunction();
                     } else {
 
-                        var eMailValidationMsg = "An Ihre angegebene eMail-Adresse wurde ein 6-stelliger Zahlencode gesandt.<br/><br/>Bitte prüfen Sie ihr Postfach und tragen Sie den Code in das unten stehende Textfeld ein. Bitte prüfen Sie ggfs. auch Ihren Spam-Ordner.";
+                        var eMailValidationMsg = "An Ihre angegebene E-Mail-Adresse wurde ein 6-stelliger Zahlencode gesandt.<br/><br/>Bitte prüfen Sie ihr Postfach und tragen Sie den Code in das unten stehende Textfeld ein. Bitte prüfen Sie ggfs. auch Ihren Spam-Ordner.";
                         var okButtonEMailValidation = "<br><tr data-dojo-attach-point=\"titleTr\"><td colspan=\"2\">" +
                             "<input class=\"eMailValidationCode\" id=\"" + validationInputId + "\"></td></tr><br><br>" +
                             "<button data-dojo-type=\"dijit/form/Button\" type=\"button\" data-dojo-props=\"onClick:function(){window.kpbValidationCodeOk();}\">OK</button>" +
                             "<button data-dojo-type=\"dijit/form/Button\" type=\"button\" data-dojo-props=\"onClick:function(){window.kpbValidationCodeResend();}\">Erneut senden</button>";
 
                         me.eMailValidationDialog = new dijitDialog({
-                            title: "Bestätigung Ihrer eMail-Adresse",
+                            title: "Bestätigung Ihrer E-Mail-Adresse",
                             style: "width: 250px;text-align:center;",
                             content: eMailValidationMsg + "<br/>" + okButtonEMailValidation,
                             closable: false,
@@ -346,10 +346,10 @@ define([
         },
 
         /**
-         * Backend-Aufruf, um den generierten Code per eMail zu verschicken.
+         * Backend-Aufruf, um den generierten Code per E-Mail zu verschicken.
          * 
-         * @param {String} code validierungscode, der per eMail verschickt werden soll.
-         * @param {String} email eMail-Adresse an die der Code geschickt wird.
+         * @param {String} code validierungscode, der per E-Mail verschickt werden soll.
+         * @param {String} E-Mail eMail-Adresse an die der Code geschickt wird.
          */
         sendValidationCode: function (code, email) {
             var me = this;
