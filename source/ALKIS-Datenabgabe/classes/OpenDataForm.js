@@ -61,8 +61,8 @@ define([
 
         // Status für Formular
         polygonValid: false,
-        emailValid: true,
-        complianceValid: true,
+        emailValid: false,
+        complianceValid: false,
 
         // Texte für Prüfergebnis der Flächenprüfung
         POLYGON_DEFAULT: "Keine Fläche vorhanden.",
@@ -105,7 +105,7 @@ define([
                 onKeyUp: function () {
                     me.emailValid = this.isValid();
                 },
-                value: "andreas@trantow-pb.de",
+                value: "",//"andreas@trantow-pb.de",
                 name: "opt_requesteremail"
             }, "opt_requesteremail");
             emailTextbox.startup();
@@ -137,12 +137,36 @@ define([
                 }
             }, "complianceCheckBox").startup();
 
-            var submitFunction = function () {
+            // Festlegen, welche Positionen für Meldungs-Popups 
+            // der ValidationTextbox möglich sein sollen
+            dijit.Tooltip.defaultPosition = ['above', 'below'];
 
-                // Wir müssem den Button explizit auf "busy" setzen,
-                // da diese nach dem ersten "Cancel" nicht mehr automatisch
-                // funktioniert.
-                submitButton.makeBusy();
+            // Um die Hinweise beim Zeichnen auf jeden Fall in Deutsch zu haben
+            // werden sie hier explizit definiert. Sonst sind sie bei mir aktuell
+            // im FF auf deutsch und im Chrome auf englisch.
+            esri.bundle.toolbars.draw.start = "Klicken, um mit dem Zeichnen zu beginnen";
+            esri.bundle.toolbars.draw.resume = "Klicken, um das Zeichnen fortzusetzen";
+            esri.bundle.toolbars.draw.complete = "Doppelklicken, um abzuschließen";
+
+            this.draw = new Draw(this.map, {
+                showTooltips: true
+            });
+
+            // Hier kann der Stil während des Zeichnens definiert werden
+            this.draw.fillSymbol = new SimpleFillSymbol("solid", new SimpleLineSymbol("solid", new Color([0, 155, 216]), 2), new Color([0, 0, 0, 0.25]));
+
+            // addGraphic is called by an external function, esriRequest
+            // hitch() is used to provide the proper context so that addGraphic
+            // will have access to the instance of this class
+            this.addGraphic = lang.hitch(this, this.addGraphic);
+
+            // if we do not bind this to "addGraphic" it will not run in scope of "this"
+            //this.addGraphic = this.addGraphic.bind(this)
+            this.draw.on("draw-complete", this.addGraphic);
+
+
+
+            var submitFunction = function () {
 
                 //window.document.getElementById("openDataForm").submit();
                 var request = esriRequest({
@@ -214,12 +238,17 @@ define([
 
             var eMailValidationCode;
             var validationInputId;
-
+            var resend = false;
             var submitButton = new BusyButton({
                 label: "Anfrage absenden",
                 busyLabel: "Anfrage absenden...",
                 disabled: false,
                 onClick: function () {
+
+                    // Wir müssem den Button explizit auf "busy" setzen,
+                    // da diese nach dem ersten "Cancel" nicht mehr automatisch
+                    // funktioniert.
+                    submitButton.makeBusy();
 
                     var okButtonOnlyHide = "<br><button data-dojo-type=\"dijit/form/Button\" type=\"submit\">OK</button>";
                     var eMailFromInput = dijitRegistry.byId("opt_requesteremail").get('value');
@@ -252,14 +281,16 @@ define([
                     // Wir setzten für diese Session einen sechstelligen Code, der per eMail verschickt wird.
                     // Da die Zufallszahl so klein sein kann, dass eine unter 6-stellige Zahl raus kommen kann,
                     // prüfen wir das und ergänzen die 6. Stelle ggfs. künstlich.
-                    eMailValidationCode = Math.floor((Math.random() * 1000000) + 1);
-                    if (eMailValidationCode < 100000) {
-                        eMailValidationCode = eMailValidationCode + 100000;
-                    }
+                    if (!resend) {
+                        eMailValidationCode = Math.floor((Math.random() * 1000000) + 1);
+                        if (eMailValidationCode < 100000) {
+                            eMailValidationCode = eMailValidationCode + 100000;
+                        }
+                    }                   
 
                     // Das Textfeld innerhalb des Dialogs braucht für jeden Durchgang eine eindeutige ID,
                     // da es bei wiederholten Aufrufen sonst zu konflikten mit nicht eindeutigen IDs kommt.
-                    validationInputId = "validationInputId_" + Math.floor((Math.random() * 10) + 1);
+                    validationInputId = "validationInputId_" + Math.floor((Math.random() * 1000) + 1);
 
                     // Wenn die eMail schon bestätigt wurde, wird direkt die Anfrage an den FME-Server geschickt.
                     if (me.validEMails[eMailFromInput.toLowerCase()]) {
@@ -268,9 +299,9 @@ define([
 
                         var eMailValidationMsg = "An Ihre angegebene E-Mail-Adresse wurde ein 6-stelliger Zahlencode gesandt.<br/><br/>Bitte prüfen Sie ihr Postfach und tragen Sie den Code in das unten stehende Textfeld ein. Bitte prüfen Sie ggfs. auch Ihren Spam-Ordner.";
                         var okButtonEMailValidation = "<br><tr data-dojo-attach-point=\"titleTr\"><td colspan=\"2\">" +
-                            "<input class=\"eMailValidationCode\" id=\"" + validationInputId + "\"></td></tr><br><br>" +
+                            "<input class=\"eMailValidationCode\" id=\"" + validationInputId + "\" onkeydown=\"window.kpbResetColor(event);\"></td></tr><br><br>" +
                             "<button data-dojo-type=\"dijit/form/Button\" type=\"button\" data-dojo-props=\"onClick:function(){window.kpbValidationCodeOk();}\">OK</button>" +
-                            "<button data-dojo-type=\"dijit/form/Button\" type=\"button\" data-dojo-props=\"onClick:function(){window.kpbValidationCodeResend();}\">Erneut senden</button>";
+                            "<button data-dojo-type=\"dijit/form/Button\" type=\"button\" data-dojo-props=\"onClick:function(){window.kpbValidationCancel();}\">Abbrechen</button>";
 
                         me.eMailValidationDialog = new dijitDialog({
                             title: "Bestätigung Ihrer E-Mail-Adresse",
@@ -290,6 +321,7 @@ define([
                             if (parseInt(input.value) === eMailValidationCode) {
                                 me.eMailValidationDialog.hide();
                                 me.validEMails[eMailFromInput.toLowerCase()] = true;
+                                resend = false;
                                 submitFunction();
                             } else {
 
@@ -298,7 +330,14 @@ define([
                             }
                         };
 
-                        window.kpbValidationCodeResend = function () {
+                        window.kpbValidationCancel = function () {
+
+                            // indem wir hier resend auf true setzen, verhindern wird, dass
+                            // beim nächsten Verschicken des Codes ein neues Code generiert wird.
+                            // Hintergrung: falls der Anwender abbricht, weil der die eMail nicht
+                            // gefunden hat (z.B: im Spam-Ordner) soll er zum selben Vorgang nicht
+                            // unterschiedliche Codes zugesandt bekommen.
+                            resend = true;
 
                             // Das Textfeld wird auf den Ausgangszustand zurück gesetzt.
                             var input = window.document.getElementById(validationInputId)
@@ -308,40 +347,21 @@ define([
                             // der Dialog wird geschlossen, da das Absenden des codes ihn wieder öffnet
                             // (oder eine Fehlermeldung, falls das Absenden fehl schlägt.)
                             me.eMailValidationDialog.hide();
-                            me.sendValidationCode(btoa(btoa(eMailValidationCode)), eMailFromInput);
+                            submitButton.cancel();
                         };
-                        
+
+                        window.kpbResetColor = function (event) {
+
+                            // Das Textfeld wird auf den Ausgangszustand zurück gesetzt.
+                            var input = window.document.getElementById(validationInputId)
+                            input.style = "color: #000000;"
+                        }
                     }
                 }
             }, "submitButton");
             submitButton.startup();
 
-            // Festlegen, welche Positionen für Meldungs-Popups 
-            // der ValidationTextbox möglich sein sollen
-            dijit.Tooltip.defaultPosition = ['above', 'below'];
-
-            // Um die Hinweise beim Zeichnen auf jeden Fall in Deutsch zu haben
-            // werden sie hier explizit definiert. Sonst sind sie bei mir aktuell
-            // im FF auf deutsch und im Chrome auf englisch.
-            esri.bundle.toolbars.draw.start = "Klicken, um mit dem Zeichnen zu beginnen";
-            esri.bundle.toolbars.draw.resume = "Klicken, um das Zeichnen fortzusetzen";
-            esri.bundle.toolbars.draw.complete = "Doppelklicken, um abzuschließen";
-
-            this.draw = new Draw(this.map, {
-                showTooltips: true
-            });
-
-            // Hier kann der Stil während des Zeichnens definiert werden
-            this.draw.fillSymbol = new SimpleFillSymbol("solid", new SimpleLineSymbol("solid", new Color([0, 155, 216]), 2), new Color([0, 0, 0, 0.25]));
-
-            // addGraphic is called by an external function, esriRequest
-            // hitch() is used to provide the proper context so that addGraphic
-            // will have access to the instance of this class
-            this.addGraphic = lang.hitch(this, this.addGraphic);
-
-            // if we do not bind this to "addGraphic" it will not run in scope of "this"
-            //this.addGraphic = this.addGraphic.bind(this)
-            this.draw.on("draw-complete", this.addGraphic);
+            
 
         },
 
