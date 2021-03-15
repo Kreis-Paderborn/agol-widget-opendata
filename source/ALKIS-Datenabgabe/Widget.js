@@ -25,6 +25,11 @@ define([
 				this.inherited(arguments);
 				this.fetchDataByName(this.config.NameOfWidgetToPresentControlsOnMap);
 
+				// Um zu verhindern, dass Eingaben über den Nummernblock im Widget 
+				// die Kartennavigation triggert (passiert, wenn der Mauszeiger über der Karte steht)
+				// wird hier die Keyboard-Navigation der Karte deaktiviert.
+				this.map.disableKeyboardNavigation();
+
 				this.makeSmall = lang.hitch(this, this.makeSmall);
 				this.makeTall = lang.hitch(this, this.makeTall);
 
@@ -130,6 +135,12 @@ define([
 				// nächsten Start sicher alles zurück gesetzt ist.
 				var pm = PanelManager.getInstance();
 				pm.destroyPanel(this.id + "_panel");
+
+				// Um zu verhindern, dass Eingaben über den Nummernblock im Widget 
+				// die Kartennavigation triggert (passiert, wenn der Mauszeiger über der Karte steht)
+				// wurde beim Start des Widget die Keyboard-Navigation der Karte deaktiviert.
+				// Diese kann nun wieder aktiviert werden.
+				this.map.enableKeyboardNavigation();
 			},
 
 			onMinimize: function () {
