@@ -43,7 +43,7 @@ define([
 
     return declare(null, {
 
-        purpose: "TEST",
+        purpose: "PRODUCTION",
         fillSymbol: null,
         map: null,
         fmeServerBaseUrl: null,
@@ -55,9 +55,7 @@ define([
         makeTallCallback: null,
         drawInMobileMode: false,
         eMailValidationDialog: null,
-        validEMails: {
-            "trantowa@kreis-paderborn.de": true
-        },
+        validEMails: {},
 
         // Status für Formular
         polygonValid: false,
@@ -297,7 +295,7 @@ define([
                         submitFunction();
                     } else {
 
-                        var eMailValidationMsg = "An Ihre angegebene E-Mail-Adresse wurde ein 6-stelliger Zahlencode gesandt.<br/><br/>Bitte prüfen Sie ihr Postfach und tragen Sie den Code in das unten stehende Textfeld ein. Bitte prüfen Sie ggfs. auch Ihren Spam-Ordner.";
+                        var eMailValidationMsg = "Es wurde ein 6-stelliger Zahlencode an folgende E-Mail-Adresse gesendet:<br/><b>"+eMailFromInput+"</b><br/><br/>Bitte prüfen Sie ihr Postfach und tragen Sie den Code in das unten stehende Textfeld ein. Bitte prüfen Sie ggfs. auch Ihren Spam-Ordner.";
                         var okButtonEMailValidation = "<br><tr data-dojo-attach-point=\"titleTr\"><td colspan=\"2\">" +
                             "<input class=\"eMailValidationCode\" id=\"" + validationInputId + "\" onkeydown=\"window.kpbResetColor(event);\"></td></tr><br><br>" +
                             "<button data-dojo-type=\"dijit/form/Button\" type=\"button\" data-dojo-props=\"onClick:function(){window.kpbValidationCodeOk();}\">OK</button>" +
