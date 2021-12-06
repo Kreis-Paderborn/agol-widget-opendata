@@ -43,7 +43,7 @@ define([
 
     return declare(null, {
 
-        purpose: "PRODUCTION",
+        purpose: "TEST",
         fillSymbol: null,
         map: null,
         fmeServerBaseUrl: null,
@@ -169,19 +169,19 @@ define([
                 //window.document.getElementById("openDataForm").submit();
                 var request = esriRequest({
                     // Location of the data
-                    url: me.fmeServerBaseUrl + "fmedatadownload/KPB_OpenData/ALKIS-Datenabgabe.fmw",
+                    url: me.fmeServerBaseUrl + "fmejobsubmitter/Kreis%20PB%20-%20OpenData/101%20ALKIS%20Anfrage%20starten.fmw",
                     // Service parameters if required, sent with URL as key/value pairs
                     content: {
-                        AuftragsnummerParam: (new Date()).getTime(),
-                        Mode: "server",
-                        opt_servicemode: "async",
+                        param_auftragsnummer: (new Date()).getTime(),
+                        opt_servicemode: "sync",
                         opt_showresult: true,
                         opt_responseformat: "json",
-                        paramRequestPolygon: me.wktPolygon,
+                        param_RequestPolygon: me.wktPolygon,
                         opt_requesteremail: dijitRegistry.byId("opt_requesteremail").get('value'),
-                        tm_tag: me.QUEUE_DAYTIME_LONG,
+                        tm_tag: me.QUEUE_DAYTIME_SHORT,
                         param_purpose: me.purpose,
-                        param_gui: me.drawInMobileMode ? "Touch" : "Desktop"
+                        param_gui: me.drawInMobileMode ? "Touch" : "Desktop",
+                        param_outputFormat: "NAS"
                     },
                     // Data format
                     handleAs: "json"
@@ -214,10 +214,10 @@ define([
 
                             // Das Anfragepolygon löschen
                             window.kpbClearWidget = function () {
-                                successMsg.hide();
-                                me.setAreaResult("initial", me.POLYGON_DEFAULT);
-                                me.map.graphics.clear();
-                                me.polygonValid = false;
+                                 successMsg.hide();
+                                 me.setAreaResult("initial", me.POLYGON_DEFAULT);
+                                 me.map.graphics.clear();
+                                 me.polygonValid = false;
                             }
                         } else {
                             failureMsg.show();
@@ -284,7 +284,7 @@ define([
                         if (eMailValidationCode < 100000) {
                             eMailValidationCode = eMailValidationCode + 100000;
                         }
-                    }                   
+                    }
 
                     // Das Textfeld innerhalb des Dialogs braucht für jeden Durchgang eine eindeutige ID,
                     // da es bei wiederholten Aufrufen sonst zu konflikten mit nicht eindeutigen IDs kommt.
@@ -295,7 +295,7 @@ define([
                         submitFunction();
                     } else {
 
-                        var eMailValidationMsg = "Es wurde ein 6-stelliger Zahlencode an folgende E-Mail-Adresse gesendet:<br/><b>"+eMailFromInput+"</b><br/><br/>Bitte prüfen Sie ihr Postfach und tragen Sie den Code in das unten stehende Textfeld ein. Bitte prüfen Sie ggfs. auch Ihren Spam-Ordner.";
+                        var eMailValidationMsg = "Es wurde ein 6-stelliger Zahlencode an folgende E-Mail-Adresse gesendet:<br/><b>" + eMailFromInput + "</b><br/><br/>Bitte prüfen Sie ihr Postfach und tragen Sie den Code in das unten stehende Textfeld ein. Bitte prüfen Sie ggfs. auch Ihren Spam-Ordner.";
                         var okButtonEMailValidation = "<br><tr data-dojo-attach-point=\"titleTr\"><td colspan=\"2\">" +
                             "<input class=\"eMailValidationCode\" id=\"" + validationInputId + "\" onkeydown=\"window.kpbResetColor(event);\"></td></tr><br><br>" +
                             "<button data-dojo-type=\"dijit/form/Button\" type=\"button\" data-dojo-props=\"onClick:function(){window.kpbValidationCodeOk();}\">OK</button>" +
@@ -359,7 +359,7 @@ define([
             }, "submitButton");
             submitButton.startup();
 
-            
+
 
         },
 
@@ -374,7 +374,7 @@ define([
 
             var request = esriRequest({
                 // Location of the data
-                url: this.fmeServerBaseUrl + "fmedatastreaming/KPB_OpenData/ALKIS-eMail-Validierung.fmw",
+                url: this.fmeServerBaseUrl + "fmedatastreaming/Kreis%20PB%20-%20OpenData/106%20ALKIS%20E-Mail-Validierung.fmw",
                 // Service parameters if required, sent with URL as key/value pairs
                 content: {
                     param_validationcode: btoa(btoa(btoa(code))),
@@ -551,7 +551,7 @@ define([
 
                 var request = esriRequest({
                     // Location of the data
-                    url: this.fmeServerBaseUrl + "fmedatastreaming/KPB_OpenData/Anfrage-Flaeche-pruefen.fmw",
+                    url: this.fmeServerBaseUrl + "fmedatastreaming/Kreis%20PB%20-%20OpenData/102%20ALKIS%20Anfragefl%C3%A4che%20pr%C3%BCfen.fmw",
                     // Service parameters if required, sent with URL as key/value pairs
                     content: {
                         paramRequestPolygon: myWKT,
