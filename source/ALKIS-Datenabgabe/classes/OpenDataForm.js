@@ -13,6 +13,8 @@ define([
     'esri/geometry/screenUtils',
     'dijit/form/ValidationTextBox',
     'dijit/form/CheckBox',
+    'dojo/store/Memory',
+    'dijit/form/ComboBox',
     'dijit/Dialog',
     'dijit/form/Button',
     'dojo/domReady!',
@@ -34,6 +36,8 @@ define([
     screenUtils,
     dijitValidationTextBox,
     dijitCheckBox,
+    Memory,
+    dijitComboBox,
     dijitDialog,
     dijitFormButton,
     dijitReady,
@@ -43,7 +47,8 @@ define([
 
     return declare(null, {
 
-        purpose: "TEST",
+        purpose: "PRODUCTION",
+        outputFormat: "NAS",
         fillSymbol: null,
         map: null,
         fmeServerBaseUrl: null,
@@ -108,6 +113,27 @@ define([
             }, "opt_requesteremail");
             emailTextbox.startup();
 
+            var formatStore = new Memory({
+                data: [
+                    { name: "NAS (ALKIS-Schnittstelle)", id: "NAS (ALKIS-Schnittstelle)", short: "NAS" },
+                    { name: "Shape (AdV-Profil 1.0.1)", id: "Shape (AdV-Profil 1.0.1)", short: "SHP" }
+                    //,{ name: "DXF (Release 2013)", id: "DXF (Release 2013)", short: "DXF" }
+                ]
+            });
+
+            var formatCombo = new dijitComboBox({
+                style: "width:100%",
+                id: "opt_format",
+                name: "opt_format",
+                searchAttr: "name",
+                value: "NAS (ALKIS-Schnittstelle)",
+                store: formatStore,
+                onChange: function (newValue) {
+                    var newFormat = formatStore.get(newValue).short;
+                    me.outputFormat = newFormat;
+
+                },
+            }, "opt_format").startup();
 
 
             var drawButton = new BusyButton({
@@ -181,7 +207,7 @@ define([
                         tm_tag: me.QUEUE_DAYTIME_SHORT,
                         param_purpose: me.purpose,
                         param_gui: me.drawInMobileMode ? "Touch" : "Desktop",
-                        param_outputFormat: "NAS"
+                        param_outputFormat: me.outputFormat
                     },
                     // Data format
                     handleAs: "json"
@@ -214,10 +240,10 @@ define([
 
                             // Das Anfragepolygon löschen
                             window.kpbClearWidget = function () {
-                                 successMsg.hide();
-                                 me.setAreaResult("initial", me.POLYGON_DEFAULT);
-                                 me.map.graphics.clear();
-                                 me.polygonValid = false;
+                                successMsg.hide();
+                                me.setAreaResult("initial", me.POLYGON_DEFAULT);
+                                me.map.graphics.clear();
+                                me.polygonValid = false;
                             }
                         } else {
                             failureMsg.show();
