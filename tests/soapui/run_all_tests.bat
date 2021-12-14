@@ -16,7 +16,7 @@ mkdir %MY_LOGDIR%
 REM RUN the SOAP-UI tests
 SET PROJECT_FILE="%~dp0OpenData-Abgabe-soapui-project.xml"
 cd %MY_LOGDIR%
-call "C:\Programme portable\SoapUI-5.4.0-EB\bin\testrunner.bat" -e%ENDPOINT% -PFME_TOKEN=%FME_SERVER_TOKEN% -r -j -f%MY_LOGDIR% %PROJECT_FILE% > %MY_LOGDIR%test_run.log
+call "C:\Programme portable\SoapUI-5.4.0-EB\bin\testrunner.bat" -e%ENDPOINT% -PFME_QS_TOKEN=%FME_SERVER_QS_TOKEN% -PFME_KPBGUEST_TOKEN=%FME_SERVER_KPBGUEST_TOKEN% -r -j -f%MY_LOGDIR% %PROJECT_FILE% > %MY_LOGDIR%test_run.log
 cd %TEST_DIR%
 
 REM Create HTML out of soap-ui's junit results
