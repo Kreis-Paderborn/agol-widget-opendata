@@ -195,7 +195,7 @@ define([
                 //window.document.getElementById("openDataForm").submit();
                 var request = esriRequest({
                     // Location of the data
-                    url: me.fmeServerBaseUrl + "fmejobsubmitter/Kreis%20PB%20-%20OpenData/101%20ALKIS%20Anfrage%20starten.fmw",
+                    url: me.fmeServerBaseUrl + "fmejobsubmitter/Kreis%20PB%20-%20OpenData%20-%20Gast/0101%20ALKIS%20Anfrage%20starten.fmw",
                     // Service parameters if required, sent with URL as key/value pairs
                     content: {
                         param_auftragsnummer: (new Date()).getTime(),
@@ -400,7 +400,7 @@ define([
 
             var request = esriRequest({
                 // Location of the data
-                url: this.fmeServerBaseUrl + "fmedatastreaming/Kreis%20PB%20-%20OpenData/106%20ALKIS%20E-Mail-Validierung.fmw",
+                url: this.fmeServerBaseUrl + "fmedatastreaming/Kreis%20PB%20-%20OpenData%20-%20Gast/0106%20ALKIS%20E-Mail-Validierung.fmw",
                 // Service parameters if required, sent with URL as key/value pairs
                 content: {
                     param_validationcode: btoa(btoa(btoa(code))),
@@ -577,7 +577,7 @@ define([
 
                 var request = esriRequest({
                     // Location of the data
-                    url: this.fmeServerBaseUrl + "fmedatastreaming/Kreis%20PB%20-%20OpenData/102%20ALKIS%20Anfragefl%C3%A4che%20pr%C3%BCfen.fmw",
+                    url: this.fmeServerBaseUrl + "fmedatastreaming/Kreis%20PB%20-%20OpenData%20-%20Gast/0102%20ALKIS%20Anfragefl%C3%A4che%20pr%C3%BCfen.fmw",
                     // Service parameters if required, sent with URL as key/value pairs
                     content: {
                         paramRequestPolygon: myWKT,
